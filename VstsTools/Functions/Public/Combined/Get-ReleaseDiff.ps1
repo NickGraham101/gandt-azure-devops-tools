@@ -28,9 +28,6 @@ function Get-ReleaseDiff {
         [string]$PatToken
     )
     
-    begin {
-    }
-    
     process {
 
         # Get project
@@ -81,7 +78,6 @@ function Get-ReleaseDiff {
                         $DiffArtifact.FullName = $Artifact
                         $DiffArtifacts += $DiffArtifact
                     }
-                    $DiffArtifacts
 
                 }
                 else {
@@ -101,6 +97,8 @@ function Get-ReleaseDiff {
 
             }
         }
+
+        $DiffArtifacts
 
     }
     
