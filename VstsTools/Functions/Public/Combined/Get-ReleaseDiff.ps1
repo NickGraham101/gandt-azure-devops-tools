@@ -70,7 +70,7 @@ function Get-ReleaseDiff {
                 $Cmd = "git diff $BaseReleaseCommitId $($ArtifactCollection.definitionReference.pullRequestMergeCommitId.id) --name-only"
                 if($Env:MSDEPLOY_HTTP_USER_AGENT -ne $null -and ($Env:MSDEPLOY_HTTP_USER_AGENT).Substring(0, 4) -eq "VSTS") {
 
-                    $DiffArtifacts = Invoke-Expression $Cmd
+                    $DiffArtifactsArray = Invoke-Expression $Cmd
                     $DiffArtifacts = @()
                     foreach ($Artifact in $DiffArtifactsArray) {
                         $DiffArtifact = New-Object -TypeName DiffArtifact
@@ -79,9 +79,21 @@ function Get-ReleaseDiff {
                         $DiffArtifacts += $DiffArtifact
                     }
 
+                    $DiffArtifacts
+
                 }
                 else {
 
+                    Set-Location C:\Users\nick\Source\Repos\grahamandtonic
+                    $DiffArtifactsArray = Invoke-Expression $Cmd
+                    $DiffArtifacts = @()
+                    foreach ($Artifact in $DiffArtifactsArray) {
+                        $DiffArtifact = New-Object -TypeName DiffArtifact
+                        $DiffArtifact.Name = $Artifact.Split("/")[$Artifact.Split("/").Length - 1]
+                        $DiffArtifact.FullName = $Artifact
+                        $DiffArtifacts += $DiffArtifact
+                    }
+                    
                     Write-Host "Cmdlet only implemented to run on VSTS.  To run locally open a cmd prompt in the local clone of the Git repo and execute:`r`n $Cmd"
 
                 }
@@ -103,3 +115,5 @@ function Get-ReleaseDiff {
     }
     
 }
+
+Get-ReleaseDiff -ProjectName grahamandtonic -BaseReleaseId 222 -TargetReleaseId 226 -Instance nickgraham101 -PatToken "6hhdqscjehgdw2worzh2fpyax7gioxwngywv4ij6gkixknkdbasa" -Verbose
