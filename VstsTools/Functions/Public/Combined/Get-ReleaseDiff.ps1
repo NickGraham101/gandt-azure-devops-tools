@@ -68,10 +68,20 @@ function Get-ReleaseDiff {
                 }
 
                 Invoke-VstsRestMethod @GetDiffParams#>
+
+                ##TO DO: remove this block when preceeding ##TO DO completed
                 $Cmd = "git diff $BaseReleaseCommitId $($ArtifactCollection.definitionReference.pullRequestMergeCommitId.id) --name-only"
                 if($Env:MSDEPLOY_HTTP_USER_AGENT -ne $null -and ($Env:MSDEPLOY_HTTP_USER_AGENT).Substring(0, 4) -eq "VSTS") {
 
-                    Invoke-Expression $Cmd
+                    $DiffArtifacts = Invoke-Expression $Cmd
+                    $DiffArtifacts = @()
+                    foreach ($Artifact in $DiffArtifactsArray) {
+                        $DiffArtifact = New-Object -TypeName DiffArtifact
+                        $DiffArtifact.Name = $Artifact.Split("/")[$Artifact.Split("/").Length - 1]
+                        $DiffArtifact.FullName = $Artifact
+                        $DiffArtifacts += $DiffArtifact
+                    }
+                    $DiffArtifacts
 
                 }
                 else {
@@ -86,7 +96,9 @@ function Get-ReleaseDiff {
                 
             }
             else {
+
                 Write-Verbose "Artifact type: $($artifactCollection.type) not recognised.  Please report an issue at $ModuleGitHubRepo"
+
             }
         }
 
