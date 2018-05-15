@@ -115,5 +115,3 @@ function Get-ReleaseDiff {
     }
     
 }
-
-Get-ReleaseDiff -ProjectName grahamandtonic -BaseReleaseId 222 -TargetReleaseId 226 -Instance nickgraham101 -PatToken "6hhdqscjehgdw2worzh2fpyax7gioxwngywv4ij6gkixknkdbasa" -Verbose
