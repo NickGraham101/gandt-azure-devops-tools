@@ -1,0 +1,33 @@
+resources:
+  repositories:
+  - repository: self
+
+jobs:
+- job: Test
+  displayName: Test
+  pool: 'Hosted VS2017'
+
+  steps:
+  # Run PowerShell tests and publish results
+  - task: PowerShell@2
+    name: InvokeTests
+    displayName: 'Invoke-Tests'
+    inputs: 
+     targetType: 'filePath'
+     filePath: $(System.DefaultWorkingDirectory)/Tests/Invoke-Tests.ps1
+     arguments: -CodeCoveragePath $(System.DefaultWorkingDirectory)\Scripts\*.ps1
+  - task: PublishTestResults@2
+    displayName: 'Publish Test Results'
+    inputs:
+     testResultsFormat: NUnit
+  - task: PublishCodeCoverageResults@1
+    displayName: 'Publish code coverage'
+    inputs:
+     summaryFileLocation: '**/CODECOVERAGE-*.xml'
+  - task: PowerShell@2
+    name: OutputTests
+    displayName: 'Out-TestResults'
+    inputs: 
+     targetType: 'filePath'
+     filePath: $(System.DefaultWorkingDirectory)/Tests/Out-TestResults.ps1
+     arguments: '-CoveragePercent 10'
