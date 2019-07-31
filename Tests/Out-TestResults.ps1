@@ -37,6 +37,7 @@ if (-not $TestResultFile) {
 }
 [xml] $TestResult = Get-Content -Path $TestResultFile
 
+<#
 if (-not $CodeCoverageFile) {
     $FindRecentFile = Get-ChildItem "$PSScriptRoot\CODECOVERAGE-*.xml" |
         Sort-Object LastWriteTime -Descending |
@@ -44,6 +45,7 @@ if (-not $CodeCoverageFile) {
     $CodeCoverageFile = $FindRecentFile.FullName
 }
 [xml] $CodeCoverage = Get-Content -Path $CodeCoverageFile
+#>
 
 $Failures = select-xml "//test-results/test-suite[@success='False']" $TestResult
 if ($Failures) {
@@ -58,9 +60,10 @@ if ($Failures) {
     Write-Error "Pester reported $NumFailures error(s)"
 }
 
+<#
 $TotalLines = 0
 $CoveredLines = 0
-select-xml "//report/counter" $CodeCoverage | ForEach-Object {
+Select-Xml  "//report/counter" $CodeCoverage | ForEach-Object {
     $TotalLines += [int] $_.Node.missed + [int] $_.Node.covered
     $CoveredLines += [int] $_.Node.covered
 }
@@ -71,3 +74,4 @@ if ($CodeCovered -lt $CoveragePercent) {
 } else {
     Write-Output "Code coverage $CodeCovered"
 }
+#>
