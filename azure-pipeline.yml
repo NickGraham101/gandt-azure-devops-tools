@@ -5,7 +5,7 @@ resources:
 jobs:
 - job: Test
   displayName: Test
-  pool: 'Hosted VS2017'
+  pool: 'Hosted Windows 2019 with VS2019'
 
   steps:
   # Run PowerShell tests and publish results
