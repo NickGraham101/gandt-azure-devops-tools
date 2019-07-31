@@ -10,18 +10,6 @@ jobs:
   steps:
   # Run PowerShell tests and publish results
   - task: PowerShell@2
-    name: UpdatePester
-    inputs:
-      targetType: inline
-      script: Install-Module Pester
-  - task: PowerShell@2
-    name: DebugPester
-    inputs:
-      targetType: inline
-      script: | 
-        Get-Command Invoke-Pester
-        Get-Help Invoke-Pester
-  - task: PowerShell@2
     name: InvokeTests
     displayName: 'Invoke-Tests'
     inputs: 
@@ -32,10 +20,10 @@ jobs:
     displayName: 'Publish Test Results'
     inputs:
      testResultsFormat: NUnit
-  - task: PublishCodeCoverageResults@1
-    displayName: 'Publish code coverage'
-    inputs:
-     summaryFileLocation: '**/CODECOVERAGE-*.xml'
+#  - task: PublishCodeCoverageResults@1
+#    displayName: 'Publish code coverage'
+#    inputs:
+#     summaryFileLocation: '**/CODECOVERAGE-*.xml'
   - task: PowerShell@2
     name: OutputTests
     displayName: 'Out-TestResults'

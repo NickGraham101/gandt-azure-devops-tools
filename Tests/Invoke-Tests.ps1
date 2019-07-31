@@ -31,13 +31,21 @@ $TestParameters = @{
     Script       = "$PSScriptRoot"
     PassThru     = $True
 }
+
 if ($TestType -ne 'All') {
+
     $TestParameters['Tag'] = $TestType
+
 }
+
+<#
 if ($CodeCoveragePath) {
+
     $TestParameters['CodeCoverage'] = $CodeCoveragePath
     $TestParameters['CodeCoverageOutputFile'] = "$PSScriptRoot\CODECOVERAGE-$TestType.xml"
+
 }
+#>
 
 # Remove previous runs
 Remove-Item "$PSScriptRoot\TEST-*.xml"
@@ -48,5 +56,7 @@ $Result = Invoke-Pester @TestParameters
 
 # report failures
 if ($Result.FailedCount -ne 0) { 
+
     Write-Error "Pester returned $($result.FailedCount) errors"
+    
 }
