@@ -11,10 +11,11 @@ jobs:
   # Run PowerShell tests and publish results
   - task: PowerShell@2
     name: DebugPester
-    targetType: inline
-    script: | 
-      Get-Command Invoke-Pester
-      Get-Help Invoke-Pester
+    inputs:
+      targetType: inline
+      script: | 
+        Get-Command Invoke-Pester
+        Get-Help Invoke-Pester
   - task: PowerShell@2
     name: InvokeTests
     displayName: 'Invoke-Tests'
