@@ -10,6 +10,11 @@ jobs:
   steps:
   # Run PowerShell tests and publish results
   - task: PowerShell@2
+    name: UpdatePester
+    inputs:
+      targetType: inline
+      script: Update-Module Pester
+  - task: PowerShell@2
     name: DebugPester
     inputs:
       targetType: inline
