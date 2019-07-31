@@ -13,7 +13,7 @@ jobs:
     name: UpdatePester
     inputs:
       targetType: inline
-      script: Update-Module Pester
+      script: Install-Module Pester
   - task: PowerShell@2
     name: DebugPester
     inputs:
