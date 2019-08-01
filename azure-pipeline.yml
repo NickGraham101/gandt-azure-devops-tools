@@ -13,21 +13,22 @@ jobs:
     name: InvokeTests
     displayName: 'Invoke-Tests'
     inputs: 
-     targetType: 'filePath'
-     filePath: $(System.DefaultWorkingDirectory)/Tests/Invoke-Tests.ps1
-     arguments: -CodeCoveragePath $(System.DefaultWorkingDirectory)\Scripts\*.ps1
+      targetType: 'filePath'
+      filePath: $(System.DefaultWorkingDirectory)/Tests/Invoke-Tests.ps1
+      arguments: -CodeCoveragePath $(System.DefaultWorkingDirectory)\Scripts\*.ps1
+    continueOnError: true
   - task: PublishTestResults@2
     displayName: 'Publish Test Results'
     inputs:
-     testResultsFormat: NUnit
+      testResultsFormat: NUnit
 #  - task: PublishCodeCoverageResults@1
 #    displayName: 'Publish code coverage'
 #    inputs:
-#     summaryFileLocation: '**/CODECOVERAGE-*.xml'
+#      summaryFileLocation: '**/CODECOVERAGE-*.xml'
   - task: PowerShell@2
     name: OutputTests
     displayName: 'Out-TestResults'
     inputs: 
-     targetType: 'filePath'
-     filePath: $(System.DefaultWorkingDirectory)/Tests/Out-TestResults.ps1
-     arguments: '-CoveragePercent 10'
+      targetType: 'filePath'
+      filePath: $(System.DefaultWorkingDirectory)/Tests/Out-TestResults.ps1
+      arguments: '-CoveragePercent 10'
