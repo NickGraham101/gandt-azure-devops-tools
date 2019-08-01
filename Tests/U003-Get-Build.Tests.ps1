@@ -2,6 +2,8 @@ Push-Location -Path $PSScriptRoot\..\
 
 Describe "Get-Build unit tests" -Tag "Unit" {
     
+    . .\VstsTools\Functions\Private\Invoke-VstsRestMethod.ps1
+
     $SharedParams = @{
         Instance = "notarealinstance"
         PatToken = "not-a-real-token"
