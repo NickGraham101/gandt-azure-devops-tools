@@ -5,6 +5,7 @@ Describe "Get-ReleaseArtifacts unit tests" -Tag "Unit" {
     . .\VstsTools\Classes\Build.ps1
     . .\VstsTools\Classes\Commit.ps1
     . .\VstsTools\Classes\Release.ps1
+    . .\VstsTools\Classes\ReleasedArtifact.ps1
     . .\VstsTools\Classes\VstsProject.ps1
     . .\VstsTools\Functions\Private\Invoke-VstsRestMethod.ps1
     . .\VstsTools\Functions\Public\Build\Get-Build.ps1
