@@ -10,7 +10,8 @@ Describe "Get-ReleaseDiff unit tests" -Tag "Unit" {
         ProjectId = "notarealprojectid"
     }
 
-    It "Will return a ..." {
+    ##TO DO: test to be implemented when function refactored to use API
+    It "Will return an array of filenames that have changed when passed 2 git commit references" -Skip {
         $TestJson = @'
 '@
 
