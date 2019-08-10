@@ -24,7 +24,7 @@ Describe "New-SerialDeployment unit tests" -Tag "Unit" {
         $TestParams["ThisRelease"] = "Release-123"
         $TestParams["PrimaryArtefactBranchName"] = "master"
 
-        { New-SerialDeployment @TestParams } | Should -Throw "Terminating serial deployment - triggering a serial deployment with a ReleaseFolderPath of '\' will release everything in your project!"
+        { New-SerialDeployment @TestParams } | Should Throw "Terminating serial deployment - triggering a serial deployment with a ReleaseFolderPath of '\' will release everything in your project!"
         
     }
 
@@ -42,7 +42,7 @@ Describe "New-SerialDeployment unit tests" -Tag "Unit" {
         $TestParams["ThisRelease"] = "Release-123"
         $TestParams["PrimaryArtefactBranchName"] = "master"
 
-        { New-SerialDeployment @TestParams } | Should -Throw "Terminating serial deployment - triggering a serial deployment with a ReleaseFolderPath of '\' will release everything in your project!"
+        { New-SerialDeployment @TestParams } | Should Throw "Terminating serial deployment - triggering a serial deployment with a ReleaseFolderPath of '\' will release everything in your project!"
         
     }
 
