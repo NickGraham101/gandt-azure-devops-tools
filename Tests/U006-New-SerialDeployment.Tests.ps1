@@ -7,10 +7,10 @@ Describe "New-SerialDeployment unit tests" -Tag "Unit" {
     $SharedParams = @{
         Instance = "notarealinstance"
         PatToken = "not-a-real-token"
-        ProjectId = "notarealprojectid"
+        ProjectName = "notarealprojectname"
     }
 
-    It "Will return a ..." {
+    It "Will throw an exception if ReleaseFolderPath parameter is '\'" {
         $TestJson = @'
 '@
 
@@ -19,8 +19,31 @@ Describe "New-SerialDeployment unit tests" -Tag "Unit" {
         . .\VstsTools\Functions\Public\Combined\New-SerialDeployment.ps1
 
         $TestParams = $SharedParams
+        $TestParams["EnvironmentName"] = "FOO"
+        $TestParams["ReleaseFolderPath"] = "\"
+        $TestParams["ThisRelease"] = "Release-123"
+        $TestParams["PrimaryArtefactBranchName"] = "master"
 
-        $Output = New-SerialDeployment @TestParams
+        { New-SerialDeployment @TestParams } | Should -Throw "Terminating serial deployment - triggering a serial deployment with a ReleaseFolderPath of '\' will release everything in your project!"
+        
+    }
+
+    It "Will throw an exception if ReleaseFolderPath parameter is '/'" -Skip {
+        $TestJson = @'
+'@
+
+        Mock Invoke-VstsRestMethod { return ConvertFrom-Json $TestJson }
+
+        . .\VstsTools\Functions\Public\Combined\New-SerialDeployment.ps1
+
+        $TestParams = $SharedParams
+        $TestParams["EnvironmentName"] = "FOO"
+        $TestParams["ReleaseFolderPath"] = "/"
+        $TestParams["ThisRelease"] = "Release-123"
+        $TestParams["PrimaryArtefactBranchName"] = "master"
+
+        { New-SerialDeployment @TestParams } | Should -Throw "Terminating serial deployment - triggering a serial deployment with a ReleaseFolderPath of '\' will release everything in your project!"
+        
     }
 
 }
