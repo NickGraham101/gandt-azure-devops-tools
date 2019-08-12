@@ -65,6 +65,7 @@ Describe "Get-Commit unit tests" -Tag "Unit" {
 
         Mock Invoke-VstsRestMethod { return ConvertFrom-Json $TestJson }
 
+        . .\VstsTools\Classes\Commit.ps1
         . .\VstsTools\Functions\Public\Git\Get-Commit.ps1
 
         $TestParams = $SharedParams
