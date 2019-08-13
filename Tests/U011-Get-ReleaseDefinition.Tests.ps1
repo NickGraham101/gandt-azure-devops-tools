@@ -2,6 +2,7 @@ Push-Location -Path $PSScriptRoot\..\
 
 Describe "Get-ReleaseDefinition unit tests" -Tag "Unit" {
     
+    . .\VstsTools\Classes\PipelineArtifact.ps1
     . .\VstsTools\Functions\Private\Invoke-VstsRestMethod.ps1
 
     $SharedParams = @{

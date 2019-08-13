@@ -4,6 +4,7 @@ Describe "Get-ReleaseArtifacts unit tests" -Tag "Unit" {
     
     . .\VstsTools\Classes\Build.ps1
     . .\VstsTools\Classes\Commit.ps1
+    . .\VstsTools\Classes\ReleaseEnvironment.ps1
     . .\VstsTools\Classes\Release.ps1
     . .\VstsTools\Classes\ReleasedArtifact.ps1
     . .\VstsTools\Classes\VstsProject.ps1
