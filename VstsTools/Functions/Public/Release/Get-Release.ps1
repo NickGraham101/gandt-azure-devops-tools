@@ -85,10 +85,10 @@ function New-ReleaseObject {
         $Release.Artifacts = $ReleaseJson.artifacts
         $Release.Environments = @()
         foreach ($Environment in $ReleaseJson.environments) {
-            $ReleaseEnvironment = New-Object -TypeName Environment
-            $ReleaseEnvironment.ReleaseEnvironmentId = $Environment.id
+            $ReleaseEnvironment = New-Object -TypeName ReleaseEnvironment
+            $ReleaseEnvironment.Id = $Environment.id
             $ReleaseEnvironment.Name = $Environment.name
-            $ReleaseEnvironment.DefinitionEnvironmentId = $Environment.definitionEnvironmentId
+            $ReleaseEnvironment.ReleaseDefintionId = $Environment.definitionEnvironmentId
             $Release.Environments += $ReleaseEnvironment
         }
 

@@ -6,6 +6,6 @@ class Release {
     [int]$ReleaseDefintionId
     [string]$ReleaseDefintionName
     [object[]]$Artifacts
-    [Environment[]]$Environments
+    [ReleaseEnvironment[]]$Environments
     
 }
