@@ -2,6 +2,7 @@ Push-Location -Path $PSScriptRoot\..\
 
 Describe "Get-Release unit tests" -Tag "Unit" {
     
+    . .\VstsTools\Classes\ReleaseEnvironment.ps1
     . .\VstsTools\Functions\Private\Invoke-VstsRestMethod.ps1
 
     $SharedParams = @{
