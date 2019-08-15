@@ -1,6 +1,6 @@
 Push-Location -Path $PSScriptRoot\..\
 
-Describe "New-Deployment unit tests" -Tag "Unit" {
+Describe "New-Release unit tests" -Tag "Unit" {
     
     . .\VstsTools\Functions\Private\Invoke-VstsRestMethod.ps1
 
@@ -10,7 +10,7 @@ Describe "New-Deployment unit tests" -Tag "Unit" {
         ProjectName = "notarealproject"
     }
 
-    It "Will call Invoke-VstsRestMethod with the PATCH HttpMethod and return a ReleaseEnvironment object" {
+    It "Will call Invoke-VstsRestMethod with the POST Http Method and return a Release object" {
         $TestJson = @'
         {
             "id": 999,
@@ -211,16 +211,16 @@ Describe "New-Deployment unit tests" -Tag "Unit" {
         Mock Invoke-VstsRestMethod { return ConvertFrom-Json $TestJson }
 
         . .\VstsTools\Classes\ReleaseEnvironment.ps1
-        . .\VstsTools\Functions\Public\Release\Get-ReleaseEnvironment.ps1
-        . .\VstsTools\Functions\Public\Release\New-Deployment.ps1
+        . .\VstsTools\Classes\Release.ps1
+        . .\VstsTools\Functions\Public\Release\Get-Release.ps1
+        . .\VstsTools\Functions\Public\Release\New-Release.ps1
 
         $TestParams = $SharedParams
-        $TestParams["EnvironmentId"] = 706
-        $TestParams["ReleaseId"] = "999"
+        $TestParams["ReleaseDefinitionId"] = "7"
 
-        $Output = New-Deployment @TestParams
-        Assert-MockCalled -CommandName Invoke-VstsRestMethod -Times 1 -ParameterFilter { $HttpMethod -eq "PATCH" -and $HttpBody.comment -eq "Requested via API call using PAT token."  -and $HttpBody.status -eq "inProgress" }
-        $Output.GetType().Name | Should Be "ReleaseEnvironment"
+        $Output = New-Release @TestParams
+        Assert-MockCalled -CommandName Invoke-VstsRestMethod -Times 1 -ParameterFilter { $HttpMethod -eq "POST" -and $HttpBody.definitionId -eq 7 -and $HttpBody.isDraft -eq $false}
+        $Output.GetType().Name | Should Be "Release"
     }
 
 }
