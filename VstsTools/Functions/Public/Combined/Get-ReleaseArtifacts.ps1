@@ -56,7 +56,7 @@ function Get-ReleaseArtifacts {
     if($MostRecentDeployment.IsPresent) {
 
         $Deployment = Get-Deployment -ReleaseDefinitionName $ReleaseDefinitionName -ReleaseEnvironment $ReleaseEnvironment -MostRecentDeployment -Instance $Instance -PatToken $PatToken -ProjectId $Project.Id
-        $Release = Get-Release -ReleaseId $Deployment.ReleaseId -Instance $Instance -PatToken $PatToken -ProjectId $Project.Id
+        $Release = Get-Release -ReleaseId $Deployment.ReleaseId -Instance $Instance -PatToken $PatToken -ProjectName $Project.Name
 
     }
     elseif($ReleaseName) {
@@ -72,7 +72,7 @@ function Get-ReleaseArtifacts {
             $Build = Get-Build -Instance $Instance -PatToken $PatToken -ProjectId $Project.Id -BuildId $ArtifactCollection.definitionReference.version.id
             $RepositoryId = $Build.RepositoryId
 
-            $Commit = Get-Commit -Instance $Instance -PatToken $PatToken -ProjectId $Project.Id -RepositoryId $RepositoryId -CommitId $artifactCollection.definitionReference.pullRequestMergeCommitId.id
+            $Commit = Get-Commit -Instance $Instance -PatToken $PatToken -ProjectId $Project.Id -RepositoryId $RepositoryId -CommitId $ArtifactCollection.definitionReference.pullRequestMergeCommitId.id
 
             $GetListItemsParams = @{
                 Instance = $Instance

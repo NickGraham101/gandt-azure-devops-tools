@@ -1,3 +1,5 @@
+[![Build Status](https://nickgraham101.visualstudio.com/GitHub%20Projects/_apis/build/status/NickGraham101.VstsTools?branchName=master)](https://nickgraham101.visualstudio.com/GitHub%20Projects/_build/latest?definitionId=18&branchName=master)
+
 # VstsTools
 
 A PowerShell module providing a wrapper for the Azure DevOps API.  The aim of this project is to provide a framework to quickly develop functions that can call the Azure DevOps API and parse the returned JSON into useful PowerShell objects.
