@@ -38,14 +38,14 @@ if ($TestType -ne 'All') {
 
 }
 
-<#
+
 if ($CodeCoveragePath) {
 
     $TestParameters['CodeCoverage'] = $CodeCoveragePath
     $TestParameters['CodeCoverageOutputFile'] = "$PSScriptRoot\CODECOVERAGE-$TestType.xml"
 
 }
-#>
+
 
 # Remove previous runs
 Remove-Item "$PSScriptRoot\TEST-*.xml"

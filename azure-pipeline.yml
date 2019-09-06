@@ -5,7 +5,7 @@ resources:
 jobs:
 - job: Test
   displayName: Test
-  pool: 'Hosted Windows 2019 with VS2019'
+  pool: 'Hosted Ubuntu 1604'
 
   steps:
   # Run PowerShell tests and publish results
@@ -21,10 +21,10 @@ jobs:
     displayName: 'Publish Test Results'
     inputs:
       testResultsFormat: NUnit
-#  - task: PublishCodeCoverageResults@1
-#    displayName: 'Publish code coverage'
-#    inputs:
-#      summaryFileLocation: '**/CODECOVERAGE-*.xml'
+  - task: PublishCodeCoverageResults@1
+    displayName: 'Publish code coverage'
+    inputs:
+      summaryFileLocation: '**/CODECOVERAGE-*.xml'
   - task: PowerShell@2
     name: OutputTests
     displayName: 'Out-TestResults'
