@@ -25,9 +25,6 @@ Param (
     [String] $CodeCoveragePath
 )
 
-Install-Module -Name Pester -Scope CurrentUser
-Import-Module Pester -Scope CurrentUser
-
 $TestParameters = @{
     OutputFormat = 'NUnitXml'
     OutputFile   = "$PSScriptRoot\TEST-$TestType.xml"
