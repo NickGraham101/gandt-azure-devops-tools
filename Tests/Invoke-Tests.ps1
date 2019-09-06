@@ -26,7 +26,7 @@ Param (
 )
 
 Install-Module -Name Pester -Scope CurrentUser
-Import-Module Pester -Scope Local
+Import-Module Pester -Scope CurrentUser
 
 $TestParameters = @{
     OutputFormat = 'NUnitXml'
