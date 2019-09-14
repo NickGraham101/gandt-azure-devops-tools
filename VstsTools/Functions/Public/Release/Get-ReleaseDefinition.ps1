@@ -97,7 +97,16 @@ function Get-ReleaseDefinition {
 
         if($ListDefinitionsJson.count -eq 1) {
 
-            $Definition = New-ReleaseDefinitionObject -DefinitionJson $ListDefinitionsJson.value[0]
+            if ($PSVersionTable.PSVersion -lt [System.Version]::new(6,0)) {
+
+                $Definition = New-ReleaseDefinitionObject -DefinitionJson $ListDefinitionsJson.value[0]
+
+            }
+            else {
+                
+                $Definition = New-ReleaseDefinitionObject -DefinitionJson $ListDefinitionsJson
+
+            }
 
             , $Definition
         
