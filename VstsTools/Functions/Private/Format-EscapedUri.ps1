@@ -12,10 +12,21 @@ function Format-EscapedUri {
         # The Uri to fix
         [Uri]$Uri
     )
-    $Uri.PathAndQuery | Out-Null
-    $m_Flags = [Uri].GetField("m_Flags", $([Reflection.BindingFlags]::Instance -bor [Reflection.BindingFlags]::NonPublic))
-    [uint64]$flags = $m_Flags.GetValue($Uri)
-    $m_Flags.SetValue($Uri, $($flags -bxor 0x30))
 
-    $Uri
+    if ($PSVersionTable.PSVersion -lt [System.Version]::new(6,0)) {
+
+
+        $Uri.PathAndQuery | Out-Null
+        $m_Flags = [Uri].GetField("m_Flags", $([Reflection.BindingFlags]::Instance -bor [Reflection.BindingFlags]::NonPublic))
+        [uint64]$flags = $m_Flags.GetValue($Uri)
+        $m_Flags.SetValue($Uri, $($flags -bxor 0x30))
+
+        $Uri
+
+    }
+    else {
+
+        throw "This method is not compatible with PowerShell Core"
+
+    }
 }

@@ -146,7 +146,15 @@ function Invoke-VstsRestMethod {
 
     $Uri = "https://$Instance$Vsrm.visualstudio.com/$Collection$TeamProject/_apis/$($Area)$($Resource)$($ResourceId)$($ResourceComponent)$($ResourceSubComponent)$($ResourceComponentId)?api-version=$($ApiVersion)$($UriParams)"
     $Uri = [uri]::EscapeUriString($Uri)
-    $Uri = Format-EscapedUri -Uri $Uri
+    if ($PSVersionTable.PSVersion -lt [System.Version]::new(6,0)) {
+
+        if ($PSVersionTable.CLRVersion -le [System.Version]::new(4,0,30319,1700)) {
+
+            $Uri = Format-EscapedUri -Uri $Uri
+
+        }
+
+    }
     Write-Verbose -Message "Invoking URI: $Uri"
     if(!$HttpBody) {
 
