@@ -2,6 +2,10 @@ resources:
   repositories:
   - repository: self
 
+trigger:
+  paths:
+    exclude: Resources\Dockerfiles\BuildAgent\buildagent.Dockerfile
+
 jobs:
 - job: Test
   displayName: Test
