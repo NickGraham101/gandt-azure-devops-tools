@@ -1,7 +1,7 @@
 variables:
   - group: ContainerRegistryVariables #this group must contain 2 variables - ContainerRegistryAdminUser & ContainerRegistryPassword
   - name: AppImageName
-  - value: vststools-build-agent
+    value: vststools-build-agent
 
 resources:
   repositories:
