@@ -21,7 +21,7 @@ jobs:
   steps:
   - script: |
       cd ./Resources/Dockerfiles/BuildAgent
-      docker build -t $(ContainerRegistryAdminUser).azurecr.io/$(AppImageName) buildagent.Dockerfile
+      docker build -t $(ContainerRegistryAdminUser).azurecr.io/$(AppImageName) --file buildagent.Dockerfile .
     displayName: 'Build app container'
   - script: |
       docker login -u $(ContainerRegistryAdminUser) -p $(ContainerRegistryPassword) $(ContainerRegistryAdminUser).azurecr.io
