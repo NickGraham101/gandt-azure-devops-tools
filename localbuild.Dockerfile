@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/powershell:ubuntu-18.04 AS agent
+FROM mcr.microsoft.com/powershell:ubuntu-16.04 AS agent
 SHELL ["pwsh", "-Command"]
 RUN Install-Module Pester -Force
 WORKDIR /module
