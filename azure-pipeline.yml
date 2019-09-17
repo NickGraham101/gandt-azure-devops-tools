@@ -5,7 +5,7 @@ resources:
 trigger:
   paths:
     exclude: 
-    - Resources\*
+    - Resources/
 
 jobs:
 - job: Test
