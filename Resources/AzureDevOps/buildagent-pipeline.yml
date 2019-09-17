@@ -9,7 +9,9 @@ resources:
 
 trigger:
   paths:
-    include: Resources\Dockerfiles\BuildAgent\buildagent.Dockerfile
+    include: 
+    - Resources/Dockerfiles/BuildAgent/buildagent.Dockerfile
+    - Resources/AzureDevOps/buildagent-pipeline.yml
 
 jobs:
 - job: BuildAgentImage
