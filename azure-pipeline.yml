@@ -4,7 +4,7 @@ resources:
 
 trigger:
   paths:
-    exclude: Resources\Dockerfiles\BuildAgent\buildagent.Dockerfile
+    exclude: Resources\*
 
 jobs:
 - job: Test
