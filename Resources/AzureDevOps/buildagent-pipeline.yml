@@ -1,7 +1,7 @@
 variables:
   - group: ContainerRegistryVariables #this group must contain 2 variables - ContainerRegistryAdminUser & ContainerRegistryPassword
-  - name: AppImageName
-    value: vststools-build-agent
+  - name: AgentImageName
+    value: vststools-build-agent:$(Build.BuildNumber)
 
 resources:
   repositories:
@@ -21,9 +21,9 @@ jobs:
   steps:
   - script: |
       cd ./Resources/Dockerfiles/BuildAgent
-      docker build -t $(ContainerRegistryAdminUser).azurecr.io/$(AppImageName) --file buildagent.Dockerfile .
+      docker build -t $(ContainerRegistryAdminUser).azurecr.io/$(AgentImageName) --file buildagent.Dockerfile .
     displayName: 'Build app container'
   - script: |
       docker login -u $(ContainerRegistryAdminUser) -p $(ContainerRegistryPassword) $(ContainerRegistryAdminUser).azurecr.io
-      docker push $(ContainerRegistryAdminUser).azurecr.io/$(AppImageName)
+      docker push $(ContainerRegistryAdminUser).azurecr.io/$(AgentImageName)
     displayName: 'Publish app container'
