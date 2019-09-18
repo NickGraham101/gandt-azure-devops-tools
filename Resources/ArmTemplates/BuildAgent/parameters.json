@@ -5,10 +5,10 @@
         "containerName": {
             "value": "github-vststools-build-aci"
         },
-        "containerCpu": {
+        "cpu": {
             "value": 1
         },
-        "containerMemoryInGb": {
+        "memoryInGb": {
             "value": "1.5"
         },
         "environmentVariables": {
