@@ -3,7 +3,7 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "containerName": {
-            "value": "github-vststools-build-aci"
+            "value": "__ContainerName__"
         },
         "cpu": {
             "value": 1
