@@ -26,7 +26,7 @@ jobs:
   - task: TotalALM.totalalm-tokenization.tokenization-build-task.Tokenization@2
     displayName: 'Tokenization: Transform file parameters.json'
     inputs:
-      SourcePath: ./Resources/ArmTemplates/BuildAgent/
+      SourcePath: '$(System.DefaultWorkingDirectory)\Resources\ArmTemplates\BuildAgent\'
       TargetFileNames: parameters.json
   - task: AzureResourceGroupDeployment@2
     displayName: 'Deploy Container Instance Group'
@@ -34,15 +34,15 @@ jobs:
       azureSubscription: $(AzureSubscription)
       resourceGroupName: $(ResourceGroupName)
       templateLocation: 'Linked artifact'
-      csmFile: ./Resources/ArmTemplates/BuildAgent/template.json
-      csmParametersFile: ./Resources/ArmTemplates/BuildAgent/parameters.json
+      csmFile: '$(System.DefaultWorkingDirectory)\Resources\ArmTemplates\BuildAgent\template.json'
+      csmParametersFile: '$(System.DefaultWorkingDirectory)\Resources\ArmTemplates\BuildAgent\parameters.json'
       action: 'Create Or Update Resource Group'
       location: 'West Europe'
       overrideParameters: '-appContainerRegistryImage "$(ContainerRegistryAdminUser).azurecr.io/$(AgentImageName)" -containerRegistryServer $(ContainerRegistryAdminUser).azurecr.io -containerRegistryUsername $(ContainerRegistryAdminUser) -containerRegistryPassword $(ContainerRegistryPassword)'
   - task: DeleteFiles@1
-    displayName: 'Delete parameters.json from $(System.DefaultWorkingDirectory)/_SkillsFundingAgency_dss-devops/Applications/NCS.DSS.AnonymiseBackup/Resources/ArmTemplates'
+    displayName: 'Delete parameters.json from $(System.DefaultWorkingDirectory)\Resources\ArmTemplates\BuildAgent\'
     inputs:
-      SourceFolder: ./Resources/ArmTemplates/BuildAgent/
+      SourceFolder: '$(System.DefaultWorkingDirectory)\Resources\ArmTemplates\BuildAgent\'
       Contents: parameters.json
     condition: always()      
 
