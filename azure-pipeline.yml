@@ -61,7 +61,7 @@ jobs:
     inputs: 
       targetType: 'filePath'
       filePath: $(System.DefaultWorkingDirectory)/Tests/Invoke-Tests.ps1
-      arguments: -CodeCoveragePath $(System.DefaultWorkingDirectory)/Scripts/*.ps1
+      arguments: -CodeCoveragePath $(System.DefaultWorkingDirectory)/VstsTools/*.ps1
     continueOnError: true
   - task: PublishTestResults@2
     displayName: 'Publish Test Results'
