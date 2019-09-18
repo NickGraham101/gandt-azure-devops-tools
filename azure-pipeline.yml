@@ -23,7 +23,7 @@ jobs:
   # Check if ACI deployed and version of image in use, set condition variable for ACI deployment step
 
   # (Re)deploy ACI if not deployed / later image available
-  - task: esfadevops.Tokenization.custom-build-task.Tokenization@0
+  - task: TotalALM.totalalm-tokenization.tokenization-build-task.Tokenization@2
     displayName: 'Tokenization: Transform file parameters.json'
     inputs:
       SourcePath: ./Resources/ArmTemplates/BuildAgent/
