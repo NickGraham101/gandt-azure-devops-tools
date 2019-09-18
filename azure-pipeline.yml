@@ -1,3 +1,9 @@
+variables:
+ - group: ContainerRegistryVariables
+ - group: VstsToolsBuildAgent
+ - name: AgentImageName
+   value: vststools-build-agent:20190917.5
+
 resources:
   repositories:
   - repository: self
@@ -8,6 +14,29 @@ trigger:
     - Resources/
 
 jobs:
+
+- job: StartAgent
+  displayName: 'Deploy and start agent'
+  pool: 'Hosted Ubuntu 1604'
+
+  steps:
+  # Check if ACI deployed and version of image in use, set condition variable for ACI deployment step
+
+  # (Re)deploy ACI if not deployed / later image available
+  - task: AzureResourceGroupDeployment@2
+    displayName: 'Deploy Container Instance Group'
+    inputs:
+      azureSubscription: $(AzureSubscription)
+      resourceGroupName: $(ResourceGroupName)
+      templateLocation: 'Linked artifact'
+      csmFile: ./Resources/ArmTemplates/BuildAgent/template.json
+      csmParametersFile: ./Resources/ArmTemplates/BuildAgent/parameters.json
+      action: 'Create Or Update Resource Group'
+      location: 'West Europe'
+      overrideParameters: '-appContainerRegistryImage "$(ContainerRegistryAdminUser).azurecr.io/$(AgentImageName)" -containerRegistryServer $(ContainerRegistryAdminUser).azurecr.io -containerRegistryUsername $(ContainerRegistryAdminUser) -containerRegistryPassword $(ContainerRegistryPassword)'
+
+  # Start ACI if image not changed
+
 - job: Test
   displayName: Test
   pool: 'Hosted Ubuntu 1604'

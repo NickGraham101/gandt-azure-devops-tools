@@ -1,0 +1,20 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "containerName": {
+            "value": "github-vststools-build-aci"
+        },
+        "containerCpu": {
+            "value": 1
+        },
+        "containerMemoryInGb": {
+            "value": "1.5"
+        },
+        "environmentVariables": {
+            "value": {
+                "variables": []
+            }
+        }
+    }
+}
