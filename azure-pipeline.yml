@@ -23,6 +23,11 @@ jobs:
   # Check if ACI deployed and version of image in use, set condition variable for ACI deployment step
 
   # (Re)deploy ACI if not deployed / later image available
+  - task: esfadevops.Tokenization.custom-build-task.Tokenization@0
+    displayName: 'Tokenization: Transform file parameters.json'
+    inputs:
+      SourcePath: ./Resources/ArmTemplates/BuildAgent/
+      TargetFileNames: parameters.json
   - task: AzureResourceGroupDeployment@2
     displayName: 'Deploy Container Instance Group'
     inputs:
@@ -34,6 +39,12 @@ jobs:
       action: 'Create Or Update Resource Group'
       location: 'West Europe'
       overrideParameters: '-appContainerRegistryImage "$(ContainerRegistryAdminUser).azurecr.io/$(AgentImageName)" -containerRegistryServer $(ContainerRegistryAdminUser).azurecr.io -containerRegistryUsername $(ContainerRegistryAdminUser) -containerRegistryPassword $(ContainerRegistryPassword)'
+  - task: DeleteFiles@1
+    displayName: 'Delete parameters.json from $(System.DefaultWorkingDirectory)/_SkillsFundingAgency_dss-devops/Applications/NCS.DSS.AnonymiseBackup/Resources/ArmTemplates'
+    inputs:
+      SourceFolder: ./Resources/ArmTemplates/BuildAgent/
+      Contents: parameters.json
+    condition: always()      
 
   # Start ACI if image not changed
 

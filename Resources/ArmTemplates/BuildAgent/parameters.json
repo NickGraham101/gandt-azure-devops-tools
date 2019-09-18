@@ -13,7 +13,20 @@
         },
         "environmentVariables": {
             "value": {
-                "variables": []
+                "variables": [
+                    {
+                        "name": "AZP_URL",
+                        "value": "__AzureDevOpsUrl__"
+                    },
+                    {
+                        "name": "AZP_TOKEN",
+                        "secureValue": "__AzureDevOpsPatToken__"
+                    },
+                    {
+                        "name": "AZP_AGENT_NAME",
+                        "value": "__AzureDevOpsAgentName__"
+                    }
+                ]
             }
         }
     }
