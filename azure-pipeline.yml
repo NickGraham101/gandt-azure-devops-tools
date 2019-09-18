@@ -38,6 +38,7 @@ jobs:
   # Start ACI if image not changed
 
 - job: Test
+  dependsOn: StartAgent
   displayName: Test
   pool: 'Hosted Ubuntu 1604'
 

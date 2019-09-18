@@ -20,10 +20,6 @@
         "cpu": {
             "type": "int"
         },
-        "managedIdentity": {
-            "type": "bool",
-            "defaultValue": false
-        },
         "memoryInGb": {
             "type":"string"
         },
@@ -40,31 +36,13 @@
             "defaultValue": "Never"
         }
     },
-    "variables": {
-        "ManagedIdentityName": "[concat(parameters('containerName'), '-umi')]",
-        "IdentityProperties": "[if(parameters('managedIdentity'), variables('IdentityTypes').ManagedIdentity, variables('IdentityTypes').NoIdentity)]",
-        "IdentityTypes": {
-            "ManagedIdentity": {
-                "type": "UserAssigned",
-                "userAssignedIdentities": {
-                    "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities/', variables('ManagedIdentityName'))]": {}
-                }
-            },
-            "NoIdentity": {
-                "type": "None"
-            }
-        }
-    },
+    "variables": {},
     "resources": [
         {
             "name": "[parameters('containerName')]",
             "type": "Microsoft.ContainerInstance/containerGroups",
-            "dependsOn": [
-                "[variables('ManagedIdentityName')]"
-            ],  
             "apiVersion": "2018-10-01",
             "location": "[resourceGroup().location]",
-            "identity": "[variables('IdentityProperties')]",
             "properties": {
                 "containers": [
                     {
@@ -93,20 +71,7 @@
                 ],
                 "restartPolicy": "[parameters('restartPolicy')]"
             }
-        },
-        {
-            "name": "[variables('ManagedIdentityName')]",
-            "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
-            "condition": "[parameters('managedIdentity')]",
-            "apiVersion": "2018-11-30",
-            "location": "[resourceGroup().location]",
-            "properties": {}
         }
     ],
-    "outputs": {
-        "ManagedIdentityObjectId": {
-            "type": "string",
-            "value": "[reference(concat('Microsoft.ManagedIdentity/userAssignedIdentities/', variables('ManagedIdentityName')), '2018-11-30').principalId]"
-        }
-    }
+    "outputs": {}
 }
