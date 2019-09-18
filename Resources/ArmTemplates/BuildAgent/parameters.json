@@ -25,6 +25,10 @@
                     {
                         "name": "AZP_AGENT_NAME",
                         "value": "__AzureDevOpsAgentName__"
+                    },
+                    {
+                        "name": "AZP_POOL",
+                        "value": "GitHubProjectsPool"
                     }
                 ]
             }
