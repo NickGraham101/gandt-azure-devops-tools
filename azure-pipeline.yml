@@ -17,7 +17,7 @@ jobs:
 
 - job: StartAgent
   displayName: 'Deploy and start agent'
-  pool: 'Hosted Ubuntu 1604'
+  pool: 'Hosted Windows 2019 with VS2019'
 
   steps:
   # Check if ACI deployed and version of image in use, set condition variable for ACI deployment step
