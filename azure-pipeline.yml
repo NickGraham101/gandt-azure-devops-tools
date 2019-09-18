@@ -61,7 +61,7 @@ jobs:
     inputs: 
       targetType: 'filePath'
       filePath: $(System.DefaultWorkingDirectory)/Tests/Invoke-Tests.ps1
-      arguments: -CodeCoveragePath $(System.DefaultWorkingDirectory)\Scripts\*.ps1
+      arguments: -CodeCoveragePath $(System.DefaultWorkingDirectory)/Scripts/*.ps1
     continueOnError: true
   - task: PublishTestResults@2
     displayName: 'Publish Test Results'
@@ -83,6 +83,7 @@ jobs:
   displayName: 'Stop the Azure Container Instance running the custom agent'
   pool: 'Hosted Windows 2019 with VS2019'
   dependsOn: [ StartAgent, TestModule ]
+  condition: always()
 
   steps:
     - task: AzureCLI@1
