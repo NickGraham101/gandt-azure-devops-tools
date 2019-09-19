@@ -11,6 +11,7 @@ param(
 $ContainerGroup = Get-AzContainerGroup -ResourceGroupName $ResourceGroupName -Name $ContainerName
 Write-Verbose "Container Group with Name $($ContainerGroup.Name) retrieved"
 
+Write-Verbose "Deployed image is $($ContainerGroup.Containers[0].Image), checking if matches $ContainerImageName"
 if ($ContainerGroup.Containers[0].Image -eq $ContainerImageName) { 
     
     Write-Verbose "Setting ImageNeedsUpdating to 'true'"
