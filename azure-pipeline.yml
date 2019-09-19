@@ -27,7 +27,7 @@ jobs:
       azureSubscription: $(AzureSubscription)
       scriptType: filePath
       scriptPath: '$(System.DefaultWorkingDirectory)\Resources\PSScripts\Test-ContainerGroupState.ps1'
-      scriptArguments:  -ContainerName $(ContainerName) -ResourceGroupName $(ResourceGroupName)
+      scriptArguments:  -ContainerName $(ContainerName) -ResourceGroupName $(ResourceGroupName) -Verbose
       azurePowerShellVersion: latestVersion
 
   # (Re)deploy ACI if not deployed / later image available
