@@ -32,7 +32,7 @@ jobs:
 
   # (Re)deploy ACI if not deployed / later image available
   - task: TotalALM.totalalm-tokenization.tokenization-build-task.Tokenization@2
-    condition: $(ImageNeedsUpdating)
+    condition: variables['ImageNeedsUpdating']
     displayName: 'Tokenization: Transform file parameters.json'
     inputs:
       SourcePath: '$(System.DefaultWorkingDirectory)\Resources\ArmTemplates\BuildAgent\'
@@ -57,7 +57,7 @@ jobs:
 
   # Start ACI if image not changed
   - task: AzureCLI@1
-    condition: $(ContainerNeedsStarting)
+    condition: variables['ContainerNeedsStarting']
     displayName: 'Start agent'
     inputs:
         azureSubscription: $(AzureSubscription)
