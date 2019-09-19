@@ -13,6 +13,13 @@ trigger:
     exclude: 
     - Resources/
 
+schedules:
+- cron: "0 0 20 * *"
+  displayName: Monthly midnight build
+  branches:
+    include:
+    - master
+
 jobs:
 
 - job: StartAgent
