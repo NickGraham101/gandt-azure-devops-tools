@@ -58,7 +58,8 @@ jobs:
   steps:
   # Run PowerShell tests and publish results
   - powershell: |
-      $Files = Get-ChildItem -Path .\VstsTools\Functions\ -File -Recurse -Include *.ps1
+      $Files = Get-ChildItem -Path $(System.DefaultWorkingDirectory)/VstsTools/Functions/ -File -Recurse -Include *.ps1
+      Write-Host "Retrieved $($Files.Count) files for code coverage"
       Write-Output "##vso[task.setvariable variable=CodeCoverageFiles]$Files"
     displayName: 'Get files for Code Coverage'
   - task: PowerShell@2
@@ -83,7 +84,7 @@ jobs:
     inputs: 
       targetType: 'filePath'
       filePath: $(System.DefaultWorkingDirectory)/Tests/Out-TestResults.ps1
-      arguments: '-CoveragePercent 10'
+      arguments: '-CoveragePercent 10 -Verbose'
 
 - job: StopAgent
   displayName: 'Stop the Azure Container Instance running the custom agent'
