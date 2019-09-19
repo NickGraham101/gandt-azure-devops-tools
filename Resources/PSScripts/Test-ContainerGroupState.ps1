@@ -12,7 +12,7 @@ $ContainerGroup = Get-AzContainerGroup -ResourceGroupName $ResourceGroupName -Na
 Write-Verbose "Container Group with Name $($ContainerGroup.Name) retrieved"
 
 Write-Verbose "Deployed image is $($ContainerGroup.Containers[0].Image), checking if matches $ContainerImageName"
-if ($ContainerGroup.Containers[0].Image -eq $ContainerImageName) { 
+if ($ContainerGroup.Containers[0].Image -ne $ContainerImageName) { 
     
     Write-Verbose "Setting ImageNeedsUpdating to 'true'"
     Write-Output "##vso[task.setvariable variable=ImageNeedsUpdating]true" 
