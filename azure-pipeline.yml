@@ -25,13 +25,10 @@ jobs:
     displayName: 'Check container state'
     inputs:
       azureSubscription: $(AzureSubscription)
-      scriptType: inlineScript
+      scriptType: filePath
+      scriptPath: '$(System.DefaultWorkingDirectory)\Resources\PSScripts\Test-ContainerGroupState.ps1'
+      scriptArguments:  -ContainerName $(ContainerName) -ResourceGroupName $(ResourceGroupName)
       azurePowerShellVersion: latestVersion
-      inline: |
-        $ContainerGroup = Get-AzContainerGroup -ResourceGroupName $(ResourceGroupName) -Name $(ContainerName) |
-        Write-Host "Container Group with Name $($ContainerGroup.Name) retrieved" | 
-        if ($ContainerGroup.Containers[0].Image -eq $($(ContainerRegistryAdminUser).azurecr.io/$(AgentImageName))) { Write-Output "##vso[task.setvariable variable=ImageNeedsUpdating]true" } |
-        if ($ContainerGroup.State -ne "Running") { Write-Output "##vso[task.setvariable variable=ContainerNeedsStarting]true" }
 
   # (Re)deploy ACI if not deployed / later image available
   - task: TotalALM.totalalm-tokenization.tokenization-build-task.Tokenization@2
