@@ -22,10 +22,11 @@ jobs:
   steps:
   # Check if ACI deployed and version of image in use, set condition variable for ACI deployment step
   - task: AzurePowerShell@4
+    displayName: 'Check container state'
     inputs:
       azureSubscription: $(AzureSubscription)
       scriptType: inlineScript
-      azurePowerShellVersion: latest
+      azurePowerShellVersion: latestVersion
       inline: |
         $ContainerGroup = Get-AzContainerGroup -ResourceGroupName $(ResourceGroupName) -Name $(ContainerName) |
         if ($ContainerGroup.Containers[0].Image -eq $($(ContainerRegistryAdminUser).azurecr.io/$(AgentImageName))) { Write-Output "##vso[task.setvariable variable=ImageNeedsUpdating]true" }
