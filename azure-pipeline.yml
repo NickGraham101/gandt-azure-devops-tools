@@ -21,10 +21,18 @@ jobs:
 
   steps:
   # Check if ACI deployed and version of image in use, set condition variable for ACI deployment step
-  ##TO DO
+  - task: AzurePowerShell@4
+    inputs:
+      azureSubscription: $(AzureSubscription)
+      scriptType: inlineScript
+      inline: |
+        $ContainerGroup = Get-AzContainerGroup -ResourceGroupName $(ResourceGroupName) -Name $(ContainerName) |
+        if ($ContainerGroup.Containers[0].Image -eq $($(ContainerRegistryAdminUser).azurecr.io/$(AgentImageName))) { Write-Output "##vso[task.setvariable variable=ImageNeedsUpdating]true" }
+        if ($ContainerGroup.State -ne "Running") { Write-Output "##vso[task.setvariable variable=ContainerNeedsStarting]true" }
 
   # (Re)deploy ACI if not deployed / later image available
   - task: TotalALM.totalalm-tokenization.tokenization-build-task.Tokenization@2
+    condition: $(ImageNeedsUpdating)
     displayName: 'Tokenization: Transform file parameters.json'
     inputs:
       SourcePath: '$(System.DefaultWorkingDirectory)\Resources\ArmTemplates\BuildAgent\'
@@ -48,7 +56,13 @@ jobs:
     condition: always()      
 
   # Start ACI if image not changed
-  ##TO DO
+  - task: AzureCLI@1
+    condition: $(ContainerNeedsStarting)
+    displayName: 'Start agent'
+    inputs:
+        azureSubscription: $(AzureSubscription)
+        scriptLocation: inlineScript
+        inlineScript: az container start --name $(ContainerName) --resource-group $(ResourceGroupName)
 
 - job: TestModule
   dependsOn: StartAgent
