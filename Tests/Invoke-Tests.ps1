@@ -20,7 +20,7 @@ Invoke-AcceptanceTests.ps1 -TestType Quality
 Param (
     [Parameter(Mandatory = $false)]
     [ValidateSet("All", "Acceptance", "Quality", "Unit")]
-    [String] $TestType = "All",
+    [String]$TestType = "All",
     [Parameter(Mandatory = $false)]
     [String]$CodeCoveragePath
 )

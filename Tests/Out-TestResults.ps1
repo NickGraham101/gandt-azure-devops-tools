@@ -40,7 +40,7 @@ if (-not $TestResultFile) {
 
 
 if (-not $CodeCoverageFile) {
-    $FindRecentFile = Get-ChildItem "$PSScriptRoot\CODECOVERAGE-*.xml" |
+    $FindRecentFile = Get-ChildItem -Path "$PSScriptRoot\CODECOVERAGE-*.xml" |
         Sort-Object LastWriteTime -Descending |
         Select-Object -First 1
     Write-Verbose "CodeCoverageFile $($FindRecentFile.FullName)"
