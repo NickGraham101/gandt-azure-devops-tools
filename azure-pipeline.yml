@@ -57,18 +57,13 @@ jobs:
 
   steps:
   # Run PowerShell tests and publish results
-  - powershell: |
-      $Files = Get-ChildItem -Path $(System.DefaultWorkingDirectory)/VstsTools/Functions/ -File -Recurse -Include *.ps1
-      Write-Host "Retrieved $($Files.Count) files for code coverage"
-      Write-Output "##vso[task.setvariable variable=CodeCoverageFiles]$Files"
-    displayName: 'Get files for Code Coverage'
   - task: PowerShell@2
     name: InvokeTests
     displayName: 'Invoke-Tests'
     inputs: 
       targetType: 'filePath'
       filePath: $(System.DefaultWorkingDirectory)/Tests/Invoke-Tests.ps1
-      arguments: -CodeCoverageFiles $(CodeCoverageFiles)
+      arguments: -CodeCoveragePath $(System.DefaultWorkingDirectory)/VstsTools/**/*.ps1
     continueOnError: true
   - task: PublishTestResults@2
     displayName: 'Publish Test Results'

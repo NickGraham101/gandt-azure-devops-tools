@@ -16,13 +16,12 @@ Invoke-AcceptanceTests.ps1 -TestType Quality
 
 #>
 
-[CmdletBinding(DefaultParameterSetName="Path")]
+[CmdletBinding()]
 Param (
+    [Parameter(Mandatory = $false)]
     [ValidateSet("All", "Acceptance", "Quality", "Unit")]
     [String] $TestType = "All",
-    [Parameter(Mandatory = $false, ParameterSetName="Files")]
-    [System.IO.FileInfo[]]$CodeCoverageFiles,
-    [Parameter(Mandatory = $false, ParameterSetName="Path")]
+    [Parameter(Mandatory = $false)]
     [String]$CodeCoveragePath
 )
 
@@ -42,13 +41,21 @@ if ($TestType -ne 'All') {
 
 if ($CodeCoveragePath) {
 
-    $TestParameters['CodeCoverage'] = $CodeCoveragePath
-    $TestParameters['CodeCoverageOutputFile'] = "$PSScriptRoot\CODECOVERAGE-$TestType.xml"
+    if ($CodeCoveragePath -match "\*\*") {
 
-}
-elseif ($CodeCoverageFiles) {
+        Write-Verbose "Getting files for code coverage"
+        $RootPath = $CodeCoveragePath.Split("**")[0]
+        $Files = Get-ChildItem -Path $RootPath -File -Recurse -Include *.ps1
+        Write-Verbose "Found $($Files.Count) files for code coverage in $RootPath"
+        $TestParameters['CodeCoverage'] = $Files
 
-    $TestParameters['CodeCoverage'] = $CodeCoverageFiles
+    }
+    else {
+
+        Write-Verbose "Using path $CodeCoveragePath for code coverage"
+        $TestParameters['CodeCoverage'] = $CodeCoveragePath
+
+    }
     $TestParameters['CodeCoverageOutputFile'] = "$PSScriptRoot\CODECOVERAGE-$TestType.xml"
 
 }
