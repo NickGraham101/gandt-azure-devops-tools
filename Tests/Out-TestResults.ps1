@@ -30,24 +30,26 @@ Param (
 )
 
 if (-not $TestResultFile) {
-    $FindRecentFile = Get-ChildItem "$PSScriptRoot\TEST-*.xml" |
+    $FindRecentFile = Get-ChildItem -Path "$PSScriptRoot\TEST-*.xml" |
         Sort-Object LastWriteTime -Descending |
         Select-Object -First 1
+    Write-Verbose "TestResultFile $($FindRecentFile.FullName)"
     $TestResultFile = $FindRecentFile.FullName
 }
 [xml] $TestResult = Get-Content -Path $TestResultFile
 
-<#
+
 if (-not $CodeCoverageFile) {
-    $FindRecentFile = Get-ChildItem "$PSScriptRoot\CODECOVERAGE-*.xml" |
+    $FindRecentFile = Get-ChildItem -Path "$PSScriptRoot\CODECOVERAGE-*.xml" |
         Sort-Object LastWriteTime -Descending |
         Select-Object -First 1
+    Write-Verbose "CodeCoverageFile $($FindRecentFile.FullName)"
     $CodeCoverageFile = $FindRecentFile.FullName
 }
 [xml] $CodeCoverage = Get-Content -Path $CodeCoverageFile
-#>
 
-$Failures = select-xml "//test-results/test-suite[@success='False']" $TestResult
+
+$Failures = Select-Xml "//test-results/test-suite[@success='False']" $TestResult
 if ($Failures) {
     $NumFailures = 0
     $Failures | ForEach-Object {
@@ -60,7 +62,7 @@ if ($Failures) {
     Write-Error "Pester reported $NumFailures error(s)"
 }
 
-<#
+
 $TotalLines = 0
 $CoveredLines = 0
 Select-Xml  "//report/counter" $CodeCoverage | ForEach-Object {
@@ -74,4 +76,3 @@ if ($CodeCovered -lt $CoveragePercent) {
 } else {
     Write-Output "Code coverage $CodeCovered"
 }
-#>

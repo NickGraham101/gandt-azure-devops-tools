@@ -1,0 +1,37 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "containerName": {
+            "value": "__ContainerName__"
+        },
+        "cpu": {
+            "value": 1
+        },
+        "memoryInGb": {
+            "value": "1.5"
+        },
+        "environmentVariables": {
+            "value": {
+                "variables": [
+                    {
+                        "name": "AZP_URL",
+                        "value": "__AzureDevOpsUrl__"
+                    },
+                    {
+                        "name": "AZP_TOKEN",
+                        "secureValue": "__AzureDevOpsPatToken__"
+                    },
+                    {
+                        "name": "AZP_AGENT_NAME",
+                        "value": "__AzureDevOpsAgentName__"
+                    },
+                    {
+                        "name": "AZP_POOL",
+                        "value": "GitHubProjectsPool"
+                    }
+                ]
+            }
+        }
+    }
+}

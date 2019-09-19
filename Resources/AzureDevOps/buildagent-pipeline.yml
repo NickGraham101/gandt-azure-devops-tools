@@ -1,0 +1,29 @@
+variables:
+  - group: ContainerRegistryVariables #this group must contain 2 variables - ContainerRegistryAdminUser & ContainerRegistryPassword
+  - name: AgentImageName
+    value: vststools-build-agent:$(Build.BuildNumber)
+
+resources:
+  repositories:
+  - repository: self
+
+trigger:
+  paths:
+    include: 
+    - Resources/Dockerfiles/BuildAgent/buildagent.Dockerfile
+    - Resources/AzureDevOps/buildagent-pipeline.yml
+
+jobs:
+- job: BuildAgentImage
+  displayName: 'Build Agent Image'
+  pool: 'Hosted Ubuntu 1604'
+
+  steps:
+  - script: |
+      cd ./Resources/Dockerfiles/BuildAgent
+      docker build -t $(ContainerRegistryAdminUser).azurecr.io/$(AgentImageName) --file buildagent.Dockerfile .
+    displayName: 'Build app container'
+  - script: |
+      docker login -u $(ContainerRegistryAdminUser) -p $(ContainerRegistryPassword) $(ContainerRegistryAdminUser).azurecr.io
+      docker push $(ContainerRegistryAdminUser).azurecr.io/$(AgentImageName)
+    displayName: 'Publish app container'

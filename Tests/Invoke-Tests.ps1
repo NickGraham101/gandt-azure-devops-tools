@@ -20,9 +20,9 @@ Invoke-AcceptanceTests.ps1 -TestType Quality
 Param (
     [Parameter(Mandatory = $false)]
     [ValidateSet("All", "Acceptance", "Quality", "Unit")]
-    [String] $TestType = "All",
+    [String]$TestType = "All",
     [Parameter(Mandatory = $false)]
-    [String] $CodeCoveragePath
+    [String]$CodeCoveragePath
 )
 
 $TestParameters = @{
@@ -38,14 +38,28 @@ if ($TestType -ne 'All') {
 
 }
 
-<#
+
 if ($CodeCoveragePath) {
 
-    $TestParameters['CodeCoverage'] = $CodeCoveragePath
+    if ($CodeCoveragePath -match "\*\*") {
+
+        Write-Verbose "Getting files for code coverage"
+        $RootPath = $CodeCoveragePath.Split("**")[0]
+        $Files = Get-ChildItem -Path $RootPath -File -Recurse -Include *.ps1
+        Write-Verbose "Found $($Files.Count) files for code coverage in $RootPath"
+        $TestParameters['CodeCoverage'] = $Files
+
+    }
+    else {
+
+        Write-Verbose "Using path $CodeCoveragePath for code coverage"
+        $TestParameters['CodeCoverage'] = $CodeCoveragePath
+
+    }
     $TestParameters['CodeCoverageOutputFile'] = "$PSScriptRoot\CODECOVERAGE-$TestType.xml"
 
 }
-#>
+
 
 # Remove previous runs
 Remove-Item "$PSScriptRoot\TEST-*.xml"

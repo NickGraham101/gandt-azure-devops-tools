@@ -62,7 +62,16 @@ function Get-Build {
         if ($BuildJson.count -eq 1) {
 
             ##TO DO: return an array (this will break other functions)
-            $Build = New-BuildObject -BuildJson $BuildJson.value
+            if ($PSVersionTable.PSVersion -lt [System.Version]::new(6,0)) {
+
+                $Build = New-BuildObject -BuildJson $BuildJson.value
+            
+            }
+            else {
+
+                $Build = New-BuildObject -BuildJson $BuildJson
+
+            }
 
             return $Build
 
@@ -90,7 +99,7 @@ function Get-Build {
             throw "No builds matched the supplied parameters"
 
         }
-
+        
         $Build = New-BuildObject -BuildJson $BuildJson
 
         $Build

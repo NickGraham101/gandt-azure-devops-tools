@@ -1,10 +1,24 @@
 Push-Location -Path $PSScriptRoot\..\
 
 Describe "Format-EscapedUri unit tests" -Tag "Unit" {
-    
-    It "Uri with query string is percent encoded when returned" {
-        . .\VstsTools\Functions\Private\Format-EscapedUri.ps1
 
+    $SkipPowerShellTests = $true
+    $SkipPowerShellCoreTests = $true
+    if ($PSVersionTable.PSVersion -lt [System.Version]::new(6,0)) {
+
+        $SkipPowerShellTests = $false
+
+    }
+    else {
+
+        $SkipPowerShellCoreTests = $false
+
+    }
+
+    . .\VstsTools\Functions\Private\Format-EscapedUri.ps1
+
+    It "Will return a percent encoded uri with query string" -Skip:$SkipPowerShellTests {
+        
         $Uri = "https://notarealinstance.visualstudio.com/notarealcollection/_apis/release/releases/1?api-version=5.0-preview.7&anotherparam=100%"
         $Output = Format-EscapedUri -Uri $Uri
 
@@ -18,5 +32,12 @@ Describe "Format-EscapedUri unit tests" -Tag "Unit" {
         $m_Flags = [Uri].GetField("m_Flags", $([Reflection.BindingFlags]::Instance -bor [Reflection.BindingFlags]::NonPublic))
         [uint64]$Flags = $m_Flags.GetValue($Output)
         $Flags | Should Be $ExpectedFlags
+    }
+
+    It "Will throw an exception on PowerShell Core" -Skip:$SkipPowerShellCoreTests {
+
+
+        $Uri = "https://notarealinstance.visualstudio.com/notarealcollection/_apis/release/releases/1?api-version=5.0-preview.7&anotherparam=100%"
+        { Format-EscapedUri -Uri $Uri } | Should -Throw "This method is not compatible with PowerShell Core"
     }
 }
