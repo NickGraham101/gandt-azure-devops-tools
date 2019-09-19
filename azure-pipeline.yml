@@ -21,6 +21,7 @@ jobs:
 
   steps:
   # Check if ACI deployed and version of image in use, set condition variable for ACI deployment step
+  ##TO DO
 
   # (Re)deploy ACI if not deployed / later image available
   - task: TotalALM.totalalm-tokenization.tokenization-build-task.Tokenization@2
@@ -47,6 +48,7 @@ jobs:
     condition: always()      
 
   # Start ACI if image not changed
+  ##TO DO
 
 - job: TestModule
   dependsOn: StartAgent
@@ -55,13 +57,17 @@ jobs:
 
   steps:
   # Run PowerShell tests and publish results
+  - powershell: |
+      $Files = Get-ChildItem -Path .\VstsTools\Functions\ -File -Recurse -Include *.ps1
+      Write-Output "##vso[task.setvariable variable=CodeCoverageFiles]$Files"
+    displayName: 'Get files for Code Coverage'
   - task: PowerShell@2
     name: InvokeTests
     displayName: 'Invoke-Tests'
     inputs: 
       targetType: 'filePath'
       filePath: $(System.DefaultWorkingDirectory)/Tests/Invoke-Tests.ps1
-      arguments: -CodeCoveragePath $(System.DefaultWorkingDirectory)/VstsTools/*.ps1
+      arguments: -CodeCoverageFiles $CodeCoverageFiles
     continueOnError: true
   - task: PublishTestResults@2
     displayName: 'Publish Test Results'

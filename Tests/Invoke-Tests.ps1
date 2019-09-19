@@ -16,13 +16,14 @@ Invoke-AcceptanceTests.ps1 -TestType Quality
 
 #>
 
-[CmdletBinding()]
+[CmdletBinding(DefaultParameterSetName="Path")]
 Param (
-    [Parameter(Mandatory = $false)]
     [ValidateSet("All", "Acceptance", "Quality", "Unit")]
     [String] $TestType = "All",
-    [Parameter(Mandatory = $false)]
-    [String] $CodeCoveragePath
+    [Parameter(Mandatory = $false, ParameterSetName="Files")]
+    [System.IO.FileInfo[]]$CodeCoverageFiles,
+    [Parameter(Mandatory = $false, ParameterSetName="Path")]
+    [String]$CodeCoveragePath
 )
 
 $TestParameters = @{
@@ -42,6 +43,12 @@ if ($TestType -ne 'All') {
 if ($CodeCoveragePath) {
 
     $TestParameters['CodeCoverage'] = $CodeCoveragePath
+    $TestParameters['CodeCoverageOutputFile'] = "$PSScriptRoot\CODECOVERAGE-$TestType.xml"
+
+}
+elseif ($CodeCoverageFiles) {
+
+    $TestParameters['CodeCoverage'] = $CodeCoverageFiles
     $TestParameters['CodeCoverageOutputFile'] = "$PSScriptRoot\CODECOVERAGE-$TestType.xml"
 
 }
