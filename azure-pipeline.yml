@@ -38,6 +38,7 @@ jobs:
       SourcePath: '$(System.DefaultWorkingDirectory)\Resources\ArmTemplates\BuildAgent\'
       TargetFileNames: parameters.json
   - task: AzureResourceGroupDeployment@2
+    condition: variables['ImageNeedsUpdating']
     displayName: 'Deploy Container Instance Group'
     inputs:
       azureSubscription: $(AzureSubscription)
@@ -49,11 +50,11 @@ jobs:
       location: 'West Europe'
       overrideParameters: '-appContainerRegistryImage "$(ContainerRegistryAdminUser).azurecr.io/$(AgentImageName)" -containerRegistryServer $(ContainerRegistryAdminUser).azurecr.io -containerRegistryUsername $(ContainerRegistryAdminUser) -containerRegistryPassword $(ContainerRegistryPassword)'
   - task: DeleteFiles@1
+    condition: always()  
     displayName: 'Delete parameters.json from $(System.DefaultWorkingDirectory)\Resources\ArmTemplates\BuildAgent\'
     inputs:
       SourceFolder: '$(System.DefaultWorkingDirectory)\Resources\ArmTemplates\BuildAgent\'
       Contents: parameters.json
-    condition: always()      
 
   # Start ACI if image not changed
   - task: AzureCLI@1
