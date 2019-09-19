@@ -72,6 +72,8 @@ jobs:
   - task: PublishCodeCoverageResults@1
     displayName: 'Publish code coverage'
     inputs:
+      codeCoverageTool: 'JaCoCo'
+      reportDirectory: $(System.DefaultWorkingDirectory)/JaCoCo
       summaryFileLocation: '**/CODECOVERAGE-*.xml'
   - task: PowerShell@2
     name: OutputTests
