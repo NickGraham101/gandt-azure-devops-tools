@@ -25,6 +25,7 @@ jobs:
     inputs:
       azureSubscription: $(AzureSubscription)
       scriptType: inlineScript
+      azurePowerShellVersion: latest
       inline: |
         $ContainerGroup = Get-AzContainerGroup -ResourceGroupName $(ResourceGroupName) -Name $(ContainerName) |
         if ($ContainerGroup.Containers[0].Image -eq $($(ContainerRegistryAdminUser).azurecr.io/$(AgentImageName))) { Write-Output "##vso[task.setvariable variable=ImageNeedsUpdating]true" }
