@@ -4,6 +4,8 @@ variables:
  - name: AgentImageName
    value: vststools-build-agent:20190917.5
 
+#this is a comment
+
 resources:
   repositories:
   - repository: self
