@@ -7,9 +7,29 @@ foreach($Class in $Classes) {
         . $Class.FullName
 
     }
+    catch [System.Management.Automation.ParseException] {
+
+        $_.Exception.ToString() -match  "Unable to find type \[(.*)\]"
+        if ($Matches) {
+
+            $MissingClass = Get-Item -Path "$($PSScriptRoot)\Classes\$($Matches[1]).ps1"
+            try {
+    
+                . $MissingClass.FullName
+        
+            }
+            catch {
+    
+                Write-Error "Failed to load missing class $($MissingClass.FullName)"
+    
+            }
+
+        }
+
+    }
     catch {
 
-        Write-Error "Failed to import function $($Class.FullName)"
+        throw "Failed to import function $($Class.FullName)"
 
     }
 
