@@ -9,18 +9,20 @@ foreach($Class in $Classes) {
     }
     catch [System.Management.Automation.ParseException] {
 
-        $_.Exception.ToString() -match  "Unable to find type \[(.*)\]"
-        if ($Matches) {
+        $MissingClasses = (Select-String -InputObject $_.Exception.ToString() -Pattern "Unable to find type \[(\w*)\]" -AllMatches).Matches | Select-Object -ExpandProperty Value
+        foreach ($MissingClass in $MissingClasses) {
 
-            $MissingClass = Get-Item -Path "$($PSScriptRoot)\Classes\$($Matches[1]).ps1"
+            $ClassName = $MissingClass -replace '(Unable to find type \[)(.*)(\])', '$2'
+            $MissingClassFile = Get-Item -Path "$($PSScriptRoot)\Classes\$($ClassName).ps1"
             try {
     
-                . $MissingClass.FullName
+                . $MissingClassFile.FullName
+                . $Class.FullName
         
             }
             catch {
     
-                Write-Error "Failed to load missing class $($MissingClass.FullName)"
+                Write-Warning "Failed to load class $($Class.FullName)"
     
             }
 
