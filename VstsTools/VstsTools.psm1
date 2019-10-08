@@ -1,3 +1,5 @@
+$script:ModuleGitHubRepo = "https://github.com/NickGraham101/VstsTools/issues"
+
 $Classes = Get-ChildItem -Path "$($PSScriptRoot)\Classes\*.ps1" -Verbose:$VerbosePreference
 
 foreach($Class in $Classes) {

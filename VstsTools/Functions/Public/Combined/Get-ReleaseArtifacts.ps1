@@ -72,7 +72,7 @@ function Get-ReleaseArtifacts {
             $Build = Get-Build -Instance $Instance -PatToken $PatToken -ProjectId $Project.Id -BuildId $ArtifactCollection.definitionReference.version.id
             $RepositoryId = $Build.RepositoryId
 
-            $Commit = Get-Commit -Instance $Instance -PatToken $PatToken -ProjectId $Project.Id -RepositoryId $RepositoryId -CommitId $ArtifactCollection.definitionReference.pullRequestMergeCommitId.id
+            $Commit = Get-Commit -Instance $Instance -PatToken $PatToken -ProjectId $Project.Id -RepositoryId $RepositoryId -CommitId $ArtifactCollection.definitionReference.sourceVersion.id
 
             $GetListItemsParams = @{
                 Instance = $Instance
