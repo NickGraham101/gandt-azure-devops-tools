@@ -45,7 +45,7 @@ Describe "Get-ReleaseArtifacts unit tests" -Tag "Unit" {
                 "type":  "Build",
                 "alias":  "_notarealalias",
                 "definitionReference":  {
-                    "pullRequestMergeCommitId":  {
+                    "sourceVersion":  {
                         "id": "2afda5892fc4441afa316bae334d36bd",
                         "name": null
                     },
