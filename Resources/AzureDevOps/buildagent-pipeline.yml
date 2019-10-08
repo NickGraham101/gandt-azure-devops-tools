@@ -13,6 +13,12 @@ trigger:
     - Resources/Dockerfiles/BuildAgent/buildagent.Dockerfile
     - Resources/AzureDevOps/buildagent-pipeline.yml
 
+pr:
+  paths:
+    include: 
+    - Resources/Dockerfiles/BuildAgent/buildagent.Dockerfile
+    - Resources/AzureDevOps/buildagent-pipeline.yml
+
 jobs:
 - job: BuildAgentImage
   displayName: 'Build Agent Image'

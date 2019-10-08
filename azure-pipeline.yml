@@ -13,6 +13,11 @@ trigger:
     exclude: 
     - Resources/
 
+pr:
+  paths:
+    exclude: 
+    - Resources/
+
 schedules:
 - cron: "0 0 20 * *"
   displayName: Monthly midnight build
