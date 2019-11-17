@@ -9,7 +9,8 @@ resources:
 
 trigger:
   branches:
-    include: master
+    include:
+    - master
   paths:
     include: 
     - Resources/Dockerfiles/BuildAgent/*
@@ -17,7 +18,8 @@ trigger:
 
 pr:
   branches:
-    include: master
+    include:
+    - master
   paths:
     include: 
     - Resources/Dockerfiles/BuildAgent/*

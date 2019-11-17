@@ -10,14 +10,16 @@ resources:
 
 trigger:
   branches:
-    include: master
+    include:
+    - master
   paths:
     exclude: 
     - Resources/
 
 pr:
   branches:
-    include: master
+    include:
+    - master
   paths:
     exclude: 
     - Resources/
