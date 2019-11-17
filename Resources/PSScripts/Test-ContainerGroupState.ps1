@@ -8,20 +8,29 @@ param(
     [String]$ResourceGroupName
 )
 
-$ContainerGroup = Get-AzContainerGroup -ResourceGroupName $ResourceGroupName -Name $ContainerName
-Write-Verbose "Container Group with Name $($ContainerGroup.Name) retrieved"
+$ContainerGroup = Get-AzContainerGroup -ResourceGroupName $ResourceGroupName -Name $ContainerName -ErrorAction SilentlyContinue
+if ($ContainerGroup) {
 
-Write-Verbose "Deployed image is $($ContainerGroup.Containers[0].Image), checking if matches $ContainerImageName"
-if ($ContainerGroup.Containers[0].Image -ne $ContainerImageName) { 
-    
-    Write-Verbose "Setting ImageNeedsUpdating to 'true'"
-    Write-Output "##vso[task.setvariable variable=ImageNeedsUpdating]true" 
+    Write-Verbose "Container Group with Name $($ContainerGroup.Name) retrieved"
+
+    Write-Verbose "Deployed image is $($ContainerGroup.Containers[0].Image), checking if matches $ContainerImageName"
+    if ($ContainerGroup.Containers[0].Image -ne $ContainerImageName) { 
+        
+        Write-Verbose "Setting ImageNeedsUpdating to 'true'"
+        Write-Output "##vso[task.setvariable variable=ImageNeedsUpdating]true" 
+
+    }
+
+    if ($ContainerGroup.State -ne "Running") { 
+        
+        Write-Verbose "Setting ContainerNeedsStarting to 'true'"
+        Write-Output "##vso[task.setvariable variable=ContainerNeedsStarting]true" 
+
+    }
 
 }
+else {
 
-if ($ContainerGroup.State -ne "Running") { 
+    Write-Verbose "Container Group $ContainerName doesn't exists"
     
-    Write-Verbose "Setting ContainerNeedsStarting to 'true'"
-    Write-Output "##vso[task.setvariable variable=ContainerNeedsStarting]true" 
-
 }
