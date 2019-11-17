@@ -10,13 +10,13 @@ resources:
 trigger:
   paths:
     include: 
-    - Resources/Dockerfiles/BuildAgent/buildagent.Dockerfile
+    - Resources/Dockerfiles/BuildAgent/*
     - Resources/AzureDevOps/buildagent-pipeline.yml
 
 pr:
   paths:
     include: 
-    - Resources/Dockerfiles/BuildAgent/buildagent.Dockerfile
+    - Resources/Dockerfiles/BuildAgent/*
     - Resources/AzureDevOps/buildagent-pipeline.yml
 
 jobs:
