@@ -31,6 +31,8 @@ if ($ContainerGroup) {
 }
 else {
 
-    Write-Verbose "Container Group $ContainerName doesn't exists"
-    
+    Write-Verbose "Container Group $ContainerName doesn't exist"
+    Write-Verbose "Setting ImageNeedsUpdating to 'true'"
+    Write-Output "##vso[task.setvariable variable=ImageNeedsUpdating]true" 
+
 }
