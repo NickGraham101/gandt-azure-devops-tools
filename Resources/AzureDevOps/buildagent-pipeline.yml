@@ -8,15 +8,21 @@ resources:
   - repository: self
 
 trigger:
+  branches:
+    include:
+    - master
   paths:
     include: 
-    - Resources/Dockerfiles/BuildAgent/buildagent.Dockerfile
+    - Resources/Dockerfiles/BuildAgent/*
     - Resources/AzureDevOps/buildagent-pipeline.yml
 
 pr:
+  branches:
+    include:
+    - master
   paths:
     include: 
-    - Resources/Dockerfiles/BuildAgent/buildagent.Dockerfile
+    - Resources/Dockerfiles/BuildAgent/*
     - Resources/AzureDevOps/buildagent-pipeline.yml
 
 jobs:

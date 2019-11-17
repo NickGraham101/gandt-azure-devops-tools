@@ -2,18 +2,24 @@ variables:
  - group: ContainerRegistryVariables
  - group: VstsToolsBuildAgent
  - name: AgentImageName
-   value: vststools-build-agent:20190917.5
+   value: vststools-build-agent:20191117.2
 
 resources:
   repositories:
   - repository: self
 
 trigger:
+  branches:
+    include:
+    - master
   paths:
     exclude: 
     - Resources/
 
 pr:
+  branches:
+    include:
+    - master
   paths:
     exclude: 
     - Resources/
