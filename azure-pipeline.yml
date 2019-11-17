@@ -2,7 +2,7 @@ variables:
  - group: ContainerRegistryVariables
  - group: VstsToolsBuildAgent
  - name: AgentImageName
-   value: vststools-build-agent:20191117.1
+   value: vststools-build-agent:20191117.2
 
 resources:
   repositories:
