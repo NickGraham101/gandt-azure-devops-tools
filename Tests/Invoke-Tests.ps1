@@ -66,11 +66,12 @@ Remove-Item "$PSScriptRoot\TEST-*.xml"
 Remove-Item "$PSScriptRoot\CODECOVERAGE-*.xml"
 
 # Invoke tests
+Import-Module Pester -RequiredVersion 4.10.0
 $Result = Invoke-Pester @TestParameters
 
 # report failures
-if ($Result.FailedCount -ne 0) { 
+if ($Result.FailedCount -ne 0) {
 
     Write-Error "Pester returned $($result.FailedCount) errors"
-    
+
 }
