@@ -26,7 +26,7 @@ Param (
 )
 
 $TestParameters = @{
-    OutputFormat = 'NUnitXml'
+    OutputFormat = 'JUnitXml'
     OutputFile   = "$PSScriptRoot\TEST-$TestType.xml"
     Script       = "$PSScriptRoot"
     PassThru     = $True
