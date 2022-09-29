@@ -61,6 +61,6 @@ jobs:
         level: minor
     - name: Push tag
       uses: actions-ecosystem/action-push-tag@v1
-      if: ${{ success() && github.ref == 'refs/heads/main' }}
+      if: ${{ success() && github.ref == 'refs/heads/master' }}
       with:
         tag: ${{ steps.bump-semver.outputs.new_version }}
