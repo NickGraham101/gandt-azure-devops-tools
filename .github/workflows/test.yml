@@ -36,6 +36,9 @@ jobs:
       if: always()
       with:
         files: '**/TEST-*.xml'
+    - name: Invoke Tests
+      shell: pwsh
+      run: Tests/Out-TestResults.ps1 -CoveragePercent 65 -Verbose
   tag:
     name: Push Git Tag
     needs: [test]
