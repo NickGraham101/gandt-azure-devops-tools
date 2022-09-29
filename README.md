@@ -1,4 +1,4 @@
-[![Build Status](https://nickgraham101.visualstudio.com/GitHub%20Projects/_apis/build/status/NickGraham101.VstsTools?branchName=master)](https://nickgraham101.visualstudio.com/GitHub%20Projects/_build/latest?definitionId=18&branchName=master)
+[![Build Status](https://github.com/NickGraham101/VstsTools/actions/workflows/test.yml/badge.svg)
 
 # VstsTools
 
