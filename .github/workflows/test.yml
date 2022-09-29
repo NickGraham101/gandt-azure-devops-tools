@@ -1,0 +1,66 @@
+name: TestAndTag
+
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master
+    types: [opened, reopened, synchronize, labelled]
+  schedule:
+  - cron: '20 0 1 * *'
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Setup PowerShell module cache
+      id: cacher
+      uses: actions/cache@v3
+      with:
+        path: "~/.local/share/powershell/Modules"
+        key: ${{ runner.os }}-Pester
+    - name: Install from PSGallery
+      if: steps.cacher.outputs.cache-hit != 'true'
+      shell: pwsh
+      run: |
+        Set-PSRepository PSGallery -InstallationPolicy Trusted
+        Install-Module Pester -RequiredVersion 4.10.0
+    - name: Invoke Tests
+      shell: pwsh
+      run: Tests/Invoke-Tests.ps1 -CodeCoveragePath ../VstsTools/**/*.ps1
+    - name: Publish Unit Test Results
+      uses: EnricoMi/publish-unit-test-result-action/composite@v1
+      if: always()
+      with:
+        files: '**/TEST-*.xml'
+    - name: Check code coverage
+      shell: pwsh
+      run: Tests/Out-TestResults.ps1 -CoveragePercent 65 -Verbose
+  tag:
+    name: Push Git Tag
+    needs: [test]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Get latest tag
+      uses: actions-ecosystem/action-get-latest-tag@v1
+      id: get-latest-tag
+      with:
+        semver_only: true
+    - name: Bump tag
+      uses: actions-ecosystem/action-bump-semver@v1
+      id: bump-semver
+      with:
+        current_version: ${{ steps.get-latest-tag.outputs.tag }}
+        level: minor
+    - name: Push tag
+      uses: actions-ecosystem/action-push-tag@v1
+      if: ${{ success() && github.ref == 'refs/heads/main' }}
+      with:
+        tag: ${{ steps.bump-semver.outputs.new_version }}
