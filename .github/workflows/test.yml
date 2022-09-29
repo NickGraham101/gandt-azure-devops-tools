@@ -36,7 +36,7 @@ jobs:
       if: always()
       with:
         files: '**/TEST-*.xml'
-    - name: Invoke Tests
+    - name: Check code coverage
       shell: pwsh
       run: Tests/Out-TestResults.ps1 -CoveragePercent 65 -Verbose
   tag:
