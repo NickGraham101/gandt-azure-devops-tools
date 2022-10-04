@@ -1,4 +1,4 @@
-[![Build Status](https://github.com/NickGraham101/VstsTools/actions/workflows/test.yml/badge.svg)
+![Build Status](https://github.com/NickGraham101/VstsTools/actions/workflows/test.yml/badge.svg)
 
 # VstsTools
 
