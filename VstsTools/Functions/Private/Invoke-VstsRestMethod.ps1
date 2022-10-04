@@ -3,7 +3,7 @@ function Invoke-VstsRestMethod {
     .SYNOPSIS
         A generic wrapper to invoke VSTS API calls.
     .DESCRIPTION
-        A generic wrapper to invoke VSTS API calls.  Parameters mirror the components of a VSTS API request.  The function is designed to be called from within the exported functions of this module rather 
+        A generic wrapper to invoke VSTS API calls.  Parameters mirror the components of a VSTS API request.  The function is designed to be called from within the exported functions of this module rather
         than called directly.  It aims to provide a standard method for executing API calls within these functions to reduce code duplication and aid readability.
     .EXAMPLE
         $GetBuildParams = @{
@@ -30,19 +30,19 @@ function Invoke-VstsRestMethod {
         #The Visual Studio Team Services account name
         [Parameter(Mandatory=$true)]
         [string]$Instance,
-        
+
         #A PAT token with the necessary scope to invoke the requested HttpMethod on the specified Resource
         [Parameter(Mandatory=$true)]
         [string]$PatToken,
-    
+
         #The project id, project name or "DefaultCollection" (the default value if not specified)
         [Parameter(Mandatory=$false)]
         [string]$Collection = "DefaultCollection",
-    
+
         #Optional.  Depending on the complexity of the resource the API path may require an Area to be specified as well as a Resource.
         [Parameter(Mandatory=$false)]
         [string]$Area,
-    
+
         #Required.  The resource being targetted.
         [Parameter(Mandatory=$true)]
         [string]$Resource,
@@ -50,7 +50,7 @@ function Invoke-VstsRestMethod {
         #Optional. Required when API request is targetting a specific resource.
         [Parameter(Mandatory=$false)]
         [string]$ResourceId,
-        
+
         #Optional.  The API allows some resource components to be targetted individually, eg the items in a Git repository.
         [Parameter(Mandatory=$false)]
         [string]$ResourceComponent,
@@ -70,21 +70,21 @@ function Invoke-VstsRestMethod {
         #Optional.  Additional URI parameters can be passed as a hash table.  Parameters whose name contains a . should be wrapped in double quotes.
         [Parameter(Mandatory=$false)]
         [hashtable]$AdditionalUriParameters,
-    
+
         #Optional.  Required when targetting resources in the Release area.
         [Parameter(Mandatory=$false)]
         [bool]$ReleaseManager = $false,
-    
+
         #The HTTP method required, eg GET, POST, etc.  The default value is GET.
         [Parameter(Mandatory=$false)]
         [ValidateSet("GET", "HEAD", "PUT", "POST", "PATCH")]
         [string]$HttpMethod = "GET",
-    
+
         #Optional.  Used in conjunction with PUT and POST HTTP Methods.
         [Parameter(Mandatory=$false)]
         [hashtable]$HttpBody
     )
-    
+
     <#
 
     ##TO DO: decide how to store variables
@@ -92,7 +92,7 @@ function Invoke-VstsRestMethod {
         Vsts Variables
         Fixed variable names if running on VSTS
     Create function(s) to do this
-    
+
     #>
 
     if($ReleaseManager -eq $true) {
@@ -100,14 +100,14 @@ function Invoke-VstsRestMethod {
         $Vsrm = ".vsrm"
 
     }
-    
+
     # Append slash to optional components
     if($TeamProject -ne $null -and $TeamProject -ne "") {
 
         $TeamProject = "/$TeamProject"
 
     }
-    
+
     if($Area -ne $null -and $Area -ne "") {
 
         $Area = "$Area/"
@@ -115,7 +115,7 @@ function Invoke-VstsRestMethod {
     }
 
     if($ResourceId -ne $null -and $ResourceId -ne "") {
-        
+
         $ResourceId = "/$ResourceId"
 
     }
@@ -158,17 +158,17 @@ function Invoke-VstsRestMethod {
     Write-Verbose -Message "Invoking URI: $Uri"
     if(!$HttpBody) {
 
-        $Result = Invoke-RestMethod -Method $HttpMethod -Uri $Uri -Headers @{Authorization = 'Basic' + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(":$($PatToken)"))} -UseBasicParsing
+        $Result = Invoke-RestMethod -Method $HttpMethod -Uri $Uri -Headers @{Authorization = 'Basic ' + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(":$($PatToken)"))} -UseBasicParsing
 
     }
     else {
 
         $JsonBody = $HttpBody | ConvertTo-Json -Depth 10
         Write-Verbose -Message "$($HttpMethod)ing body of`n$JsonBody"
-        $Result = Invoke-RestMethod -Method $HttpMethod -Uri $Uri -Headers @{Authorization = 'Basic' + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(":$($PatToken)"))} -Body $JsonBody -ContentType application/json -UseBasicParsing
+        $Result = Invoke-RestMethod -Method $HttpMethod -Uri $Uri -Headers @{Authorization = 'Basic ' + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(":$($PatToken)"))} -Body $JsonBody -ContentType application/json -UseBasicParsing
 
     }
-    
+
     ##TO DO: investigate returning useful error messages
 
     $Result
