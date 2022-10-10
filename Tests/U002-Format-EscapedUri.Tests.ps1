@@ -15,10 +15,10 @@ Describe "Format-EscapedUri unit tests" -Tag "Unit" {
 
     }
 
-    . .\VstsTools\Functions\Private\Format-EscapedUri.ps1
+    . .\gandt-azure-devops-tools\Functions\Private\Format-EscapedUri.ps1
 
     It "Will return a percent encoded uri with query string" -Skip:$SkipPowerShellTests {
-        
+
         $Uri = "https://notarealinstance.visualstudio.com/notarealcollection/_apis/release/releases/1?api-version=5.0-preview.7&anotherparam=100%"
         $Output = Format-EscapedUri -Uri $Uri
 

@@ -9,10 +9,10 @@ function Get-Build {
         #The Visual Studio Team Services account name
         [Parameter(Mandatory=$true)]
         [string]$Instance,
-        
+
         #A PAT token with the necessary scope to invoke the requested HttpMethod on the specified Resource
         [Parameter(Mandatory=$true)]
-        [string]$PatToken,   
+        [string]$PatToken,
 
         #Parameter Description
         [Parameter(Mandatory=$true)]
@@ -31,7 +31,7 @@ function Get-Build {
         [int]$BuildDefinitionId
 
     )
-    
+
     process {
 
         $GetBuildParams = @{
@@ -57,7 +57,7 @@ function Get-Build {
 
         }
 
-        $BuildJson = Invoke-VstsRestMethod @GetBuildParams
+        $BuildJson = Invoke-AzDevOpsRestMethod @GetBuildParams
 
         if ($BuildJson.count -eq 1) {
 
@@ -65,7 +65,7 @@ function Get-Build {
             if ($PSVersionTable.PSVersion -lt [System.Version]::new(6,0)) {
 
                 $Build = New-BuildObject -BuildJson $BuildJson.value
-            
+
             }
             else {
 
@@ -90,7 +90,7 @@ function Get-Build {
 
         }
         elseif ($BuildJson | Get-Member -Name buildNumber) {
-            
+
             $Build = New-BuildObject -BuildJson $BuildJson
 
         }
@@ -99,7 +99,7 @@ function Get-Build {
             throw "No builds matched the supplied parameters"
 
         }
-        
+
         $Build = New-BuildObject -BuildJson $BuildJson
 
         $Build
@@ -136,6 +136,6 @@ function New-BuildObject {
         }
 
         $Build
-    
+
     }
 }

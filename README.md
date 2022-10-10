@@ -1,6 +1,6 @@
-![Build Status](https://github.com/NickGraham101/VstsTools/actions/workflows/test.yml/badge.svg)
+![Build Status](https://github.com/NickGraham101/gandt-azure-devops-tools/actions/workflows/test.yml/badge.svg)
 
-# VstsTools
+# gandt-azure-devops-tools
 
 A PowerShell module providing a wrapper for the Azure DevOps API.  The aim of this project is to provide a framework to quickly develop functions that can call the Azure DevOps API and parse the returned JSON into useful PowerShell objects.
 
@@ -36,4 +36,3 @@ Please make sure to update tests as appropriate.
 ## Licence
 
 [GPL-3.0](/LICENSE)
-

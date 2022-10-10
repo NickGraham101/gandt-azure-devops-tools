@@ -1,9 +1,9 @@
 Push-Location -Path $PSScriptRoot\..\
 
 Describe "Get-Release unit tests" -Tag "Unit" {
-    
-    . .\VstsTools\Classes\ReleaseEnvironment.ps1
-    . .\VstsTools\Functions\Private\Invoke-VstsRestMethod.ps1
+
+    . .\gandt-azure-devops-tools\Classes\ReleaseEnvironment.ps1
+    . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
 
     $SharedParams = @{
         Instance = "notarealinstance"
@@ -147,7 +147,7 @@ Describe "Get-Release unit tests" -Tag "Unit" {
             "variableGroups": [
                 {
                     "variables": "@{SecretOne=; SecretTwo=;}",
-                    "type": "Vsts",
+                    "type": "AzDevOps",
                     "id": 1,
                     "name": "AVariableGroup",
                     "description": "A description",
@@ -157,9 +157,9 @@ Describe "Get-Release unit tests" -Tag "Unit" {
             ],
             "artifacts": [
                 {
-                    "sourceId": "3bbdecb1-ff63-4665-baab-3d7547ef5827:notarealinstance/VstsTools",
+                    "sourceId": "3bbdecb1-ff63-4665-baab-3d7547ef5827:notarealinstance/AzDevOps",
                     "type": "GitHub",
-                    "alias": "_notarealinstance_VstsTools",
+                    "alias": "_notarealinstance_AzDevOps",
                     "definitionReference": "@{artifactSourceDefinitionUrl=; branch=; checkoutSubmodules=; connection=; definition=; fetchDepth=; gitLfsSupport=; version=; artifactSourceVersionUrl=}",
                     "isRetained": false
                 },
@@ -209,10 +209,10 @@ Describe "Get-Release unit tests" -Tag "Unit" {
         }
 '@
 
-        Mock Invoke-VstsRestMethod { return ConvertFrom-Json $TestJson }
+        Mock Invoke-AzDevOpsRestMethod { return ConvertFrom-Json $TestJson }
 
-        . .\VstsTools\Classes\Release.ps1
-        . .\VstsTools\Functions\Public\Release\Get-Release.ps1
+        . .\gandt-azure-devops-tools\Classes\Release.ps1
+        . .\gandt-azure-devops-tools\Functions\Public\Release\Get-Release.ps1
 
         $TestParams = $SharedParams
         $TestParams["ReleaseName"] = "Release-123"

@@ -1,4 +1,4 @@
-class VstsProject {
+class AzDevOpsProject {
 
     [string]$Id
     [string]$Name

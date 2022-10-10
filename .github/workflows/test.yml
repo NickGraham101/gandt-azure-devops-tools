@@ -32,7 +32,7 @@ jobs:
         Install-Module Pester -RequiredVersion 4.10.0
     - name: Invoke Tests
       shell: pwsh
-      run: Tests/Invoke-Tests.ps1 -CodeCoveragePath ../VstsTools/**/*.ps1
+      run: Tests/Invoke-Tests.ps1 -CodeCoveragePath ./gandt-azure-devops-tools/**/*.ps1
     - name: Publish Unit Test Results
       uses: EnricoMi/publish-unit-test-result-action/composite@v1
       if: always()
@@ -48,6 +48,9 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
+    - name: Get release label
+      uses: actions-ecosystem/action-release-label@v1
+      id: release-label
     - name: Get latest tag
       uses: actions-ecosystem/action-get-latest-tag@v1
       id: get-latest-tag
@@ -58,7 +61,7 @@ jobs:
       id: bump-semver
       with:
         current_version: ${{ steps.get-latest-tag.outputs.tag }}
-        level: minor
+        level: ${{ steps.release-label.outputs.level }}
     - name: Push tag
       uses: actions-ecosystem/action-push-tag@v1
       if: ${{ success() && github.ref == 'refs/heads/master' }}

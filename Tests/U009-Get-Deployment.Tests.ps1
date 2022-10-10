@@ -1,11 +1,11 @@
 Push-Location -Path $PSScriptRoot\..\
 
 Describe "Get-Deployment unit tests" -Tag "Unit" {
-    
-    . .\VstsTools\Classes\PipelineArtifact.ps1
-    . .\VstsTools\Classes\ReleaseDefinition.ps1
-    . .\VstsTools\Functions\Public\Release\Get-ReleaseDefinition.ps1
-    . .\VstsTools\Functions\Private\Invoke-VstsRestMethod.ps1
+
+    . .\gandt-azure-devops-tools\Classes\PipelineArtifact.ps1
+    . .\gandt-azure-devops-tools\Classes\ReleaseDefinition.ps1
+    . .\gandt-azure-devops-tools\Functions\Public\Release\Get-ReleaseDefinition.ps1
+    . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
 
     $SharedParams = @{
         Instance = "notarealinstance"
@@ -30,7 +30,7 @@ Describe "Get-Deployment unit tests" -Tag "Unit" {
                                     "name":  "Release-123",
                                     "url":  "https://notarealinstance.vsrm.visualstudio.com/98b8c3b7-3dda-46c9-9a9f-c22b9c394da7/_apis/Release/releases/99",
                                     "artifacts":  [
-                                                      "@{sourceId=3f67c97d-8312-419f-8687-6287735adba7:notarealinstance/VstsTools; type=GitHub; alias=_notarealinstance_VstsTools; definitionReference=; isRetained=False}",
+                                                      "@{sourceId=3f67c97d-8312-419f-8687-6287735adba7:notarealinstance/AzDevOps; type=GitHub; alias=_notarealinstance_AzDevOps; definitionReference=; isRetained=False}",
                                                       "@{sourceId=98b8c3b7-3dda-46c9-9a9f-c22b9c394da7:12; type=Build; alias=_notarealproject-blog; definitionReference=; isPrimary=True; isRetained=False}"
                                                   ],
                                     "webAccessUri":  "https://notarealinstance.visualstudio.com/98b8c3b7-3dda-46c9-9a9f-c22b9c394da7/_release?releaseId=99\u0026_a=release-summary",
@@ -100,7 +100,7 @@ Describe "Get-Deployment unit tests" -Tag "Unit" {
                                            "descriptor":  "s2s.MDAwMDAwMGQtMDAwMC04ODg4LTgwMDAtMDAwMDAwMDAwMDAwZFGoODk1OTA4LTA0ZTAtNDk1Mi04OWZkLTU0YjAwNDZkNjI4OA"
                                        },
                     "conditions":  [
-                
+
                                    ],
                     "preDeployApprovals":  [
                                                {
@@ -143,7 +143,7 @@ Describe "Get-Deployment unit tests" -Tag "Unit" {
                                                 }
                                             ],
                     "_links":  {
-                
+
                                }
                 }
             ]
@@ -151,10 +151,10 @@ Describe "Get-Deployment unit tests" -Tag "Unit" {
 
 '@
 
-        Mock Invoke-VstsRestMethod { return ConvertFrom-Json $TestJson }
+        Mock Invoke-AzDevOpsRestMethod { return ConvertFrom-Json $TestJson }
 
-        . .\VstsTools\Classes\Deployment.ps1
-        . .\VstsTools\Functions\Public\Release\Get-Deployment.ps1
+        . .\gandt-azure-devops-tools\Classes\Deployment.ps1
+        . .\gandt-azure-devops-tools\Functions\Public\Release\Get-Deployment.ps1
 
         $TestParams = $SharedParams
         $TestParams["ReleaseDefinitionName"] = "NotARealReleaseDefinition"

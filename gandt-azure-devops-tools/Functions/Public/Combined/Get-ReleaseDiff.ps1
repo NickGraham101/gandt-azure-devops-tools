@@ -3,48 +3,48 @@ function Get-ReleaseDiff {
     .SYNOPSIS
     Get the Git diffs between the artifacts associated with two releases.
     .NOTES
-    API Reference: 
+    API Reference:
 #>
     [CmdletBinding()]
     param (
         #Parameter Description
         [Parameter(Mandatory=$true)]
-        [string]$ProjectName,    
+        [string]$ProjectName,
 
-        #Parameter Description    
+        #Parameter Description
         [Parameter(Mandatory=$true)]
         [string]$BaseReleaseId,
 
-        #Use $(Release.ReleaseId) if calling from VSTS
+        #Use $(Release.ReleaseId) if calling from AzDevOps
         [Parameter(Mandatory=$true)]
         [string]$TargetReleaseId,
-    
+
         #The Visual Studio Team Services account name
         [Parameter(Mandatory=$true)]
         [string]$Instance,
-        
+
         #A PAT token with the necessary scope to invoke the requested HttpMethod on the specified Resource
         [Parameter(Mandatory=$true)]
         [string]$PatToken
     )
-    
+
     process {
 
         # Get project
-        $Project = Get-VstsProject -Instance $Instance -PatToken $PatToken -ProjectName $ProjectName
+        $Project = Get-AzDevOpsProject -Instance $Instance -PatToken $PatToken -ProjectName $ProjectName
 
         $TargetRelease = Get-Release  -Instance $Instance -PatToken $PatToken -ProjectName $ProjectName -ReleaseId $TargetReleaseId
         $BaseRelease = Get-Release  -Instance $Instance -PatToken $PatToken -ProjectName $ProjectName -ReleaseId $BaseReleaseId
 
         foreach($ArtifactCollection in $TargetRelease.Artifacts) {
-    
+
             if($ArtifactCollection.type -eq "Build") {
-    
+
                 $TargetBuild = Get-Build -Instance $Instance -PatToken $PatToken -ProjectId $Project.Id -BuildId $ArtifactCollection.definitionReference.version.id
                 $RepositoryId = $TargetBuild.RepositoryId
 
                 $BaseReleaseCommitId = ($BaseRelease.Artifacts | Where-Object {$_.type -eq "Build"}).definitionReference.pullRequestMergeCommitId.id
-    
+
                 ##TO DO: implement when API docs updated / functionality works
                 <#$GetDiffParams = @{
                     Instance = $Instance
@@ -52,7 +52,7 @@ function Get-ReleaseDiff {
                     Collection = $Project.id
                     Area = "git"
                     Resource = "repositories"
-                    ResourceId = $RepositoryId 
+                    ResourceId = $RepositoryId
                     ResourceComponent = "diffs"
                     ResourceSubComponent = "commits"
                     ApiVersion = "5.0-preview.1"
@@ -64,13 +64,13 @@ function Get-ReleaseDiff {
                     }
                 }
 
-                Invoke-VstsRestMethod @GetDiffParams#>
+                Invoke-AzDevOpsRestMethod @GetDiffParams#>
 
                 ##TO DO: remove this block when preceeding ##TO DO completed
                 $Cmd = "git diff $BaseReleaseCommitId $($ArtifactCollection.definitionReference.pullRequestMergeCommitId.id) --name-only"
-                if($Env:MSDEPLOY_HTTP_USER_AGENT -ne $null -and ($Env:MSDEPLOY_HTTP_USER_AGENT).Substring(0, 4) -eq "VSTS") {
+                if($Env:MSDEPLOY_HTTP_USER_AGENT -ne $null -and ($Env:MSDEPLOY_HTTP_USER_AGENT).Substring(0, 4) -eq "AzDevOps") {
 
-                    Write-Verbose "Running on VSTS"
+                    Write-Verbose "Running on AzDevOps"
                     Write-Verbose "Invoking expression $Cmd"
                     $DiffArtifactsArray = Invoke-Expression $Cmd
                     Write-Verbose "Cmd $Cmd returned $($DiffArtifactsArray.count) results"
@@ -85,14 +85,14 @@ function Get-ReleaseDiff {
                 }
                 else {
 
-                    Write-Host "Cmdlet only implemented to run on VSTS.  To run locally open a cmd prompt in the local clone of the Git repo and execute:`r`n $Cmd"
+                    Write-Host "Cmdlet only implemented to run on AzDevOps.  To run locally open a cmd prompt in the local clone of the Git repo and execute:`r`n $Cmd"
 
                 }
 
-    
+
             }
             elseif ($artifactCollection.type -eq "Git") {
-                
+
             }
             else {
 
@@ -104,5 +104,5 @@ function Get-ReleaseDiff {
         $DiffArtifacts
 
     }
-    
+
 }

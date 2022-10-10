@@ -1,9 +1,9 @@
-function Invoke-VstsRestMethod {
+function Invoke-AzDevOpsRestMethod {
     <#
     .SYNOPSIS
-        A generic wrapper to invoke VSTS API calls.
+        A generic wrapper to invoke AzDevOps API calls.
     .DESCRIPTION
-        A generic wrapper to invoke VSTS API calls.  Parameters mirror the components of a VSTS API request.  The function is designed to be called from within the exported functions of this module rather
+        A generic wrapper to invoke AzDevOps API calls.  Parameters mirror the components of a AzDevOps API request.  The function is designed to be called from within the exported functions of this module rather
         than called directly.  It aims to provide a standard method for executing API calls within these functions to reduce code duplication and aid readability.
     .EXAMPLE
         $GetBuildParams = @{
@@ -16,9 +16,9 @@ function Invoke-VstsRestMethod {
             ApiVersion = "4.1"
         }
 
-        $Build = Invoke-VstsRestMethod @GetBuildParams
+        $Build = Invoke-AzDevOpsRestMethod @GetBuildParams
 
-        Invokes the Builds - Get method of the VSTS API and returns the build specified in BuildId from the project specified in ProjectId
+        Invokes the Builds - Get method of the AzDevOps API and returns the build specified in BuildId from the project specified in ProjectId
     .OUTPUTS
         PSObject
         Returns a PSObject that represents the strings in a JSON object
@@ -89,8 +89,8 @@ function Invoke-VstsRestMethod {
 
     ##TO DO: decide how to store variables
         Environment Variables
-        Vsts Variables
-        Fixed variable names if running on VSTS
+        AzDevOps Variables
+        Fixed variable names if running on AzDevOps
     Create function(s) to do this
 
     #>

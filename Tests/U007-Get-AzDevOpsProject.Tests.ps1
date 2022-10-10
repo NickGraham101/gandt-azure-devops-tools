@@ -1,8 +1,8 @@
 Push-Location -Path $PSScriptRoot\..\
 
-Describe "Get-VstsProject unit tests" -Tag "Unit" {
-    
-    . .\VstsTools\Functions\Private\Invoke-VstsRestMethod.ps1
+Describe "Get-AzDevOpsProject unit tests" -Tag "Unit" {
+
+    . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
 
     $SharedParams = @{
         Instance = "notarealinstance"
@@ -10,7 +10,7 @@ Describe "Get-VstsProject unit tests" -Tag "Unit" {
         ProjectName = "notarealproject"
     }
 
-    It "Will return a VstsProject object when passed a ProjectName" {
+    It "Will return a AzDevOpsProject object when passed a ProjectName" {
         $TestJson = @'
         {
             "count":  3,
@@ -47,15 +47,15 @@ Describe "Get-VstsProject unit tests" -Tag "Unit" {
         }
 '@
 
-        Mock Invoke-VstsRestMethod { return ConvertFrom-Json $TestJson }
+        Mock Invoke-AzDevOpsRestMethod { return ConvertFrom-Json $TestJson }
 
-        . .\VstsTools\Classes\VstsProject.ps1
-        . .\VstsTools\Functions\Public\Core\Get-VstsProject.ps1
+        . .\gandt-azure-devops-tools\Classes\AzDevOpsProject.ps1
+        . .\gandt-azure-devops-tools\Functions\Public\Core\Get-AzDevOpsProject.ps1
 
         $TestParams = $SharedParams
 
-        $Output = Get-VstsProject @TestParams
-        $Output.GetType().Name | Should Be "VstsProject"
+        $Output = Get-AzDevOpsProject @TestParams
+        $Output.GetType().Name | Should Be "AzDevOpsProject"
         $Output.Id | Should Be "c391561c-ca89-434a-b4f5-e017f4db897a"
     }
 

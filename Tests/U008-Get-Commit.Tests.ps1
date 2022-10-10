@@ -1,8 +1,8 @@
 Push-Location -Path $PSScriptRoot\..\
 
 Describe "Get-Commit unit tests" -Tag "Unit" {
-    
-    . .\VstsTools\Functions\Private\Invoke-VstsRestMethod.ps1
+
+    . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
 
     $SharedParams = @{
         Instance = "notarealinstance"
@@ -63,10 +63,10 @@ Describe "Get-Commit unit tests" -Tag "Unit" {
         }
 '@
 
-        Mock Invoke-VstsRestMethod { return ConvertFrom-Json $TestJson }
+        Mock Invoke-AzDevOpsRestMethod { return ConvertFrom-Json $TestJson }
 
-        . .\VstsTools\Classes\Commit.ps1
-        . .\VstsTools\Functions\Public\Git\Get-Commit.ps1
+        . .\gandt-azure-devops-tools\Classes\Commit.ps1
+        . .\gandt-azure-devops-tools\Functions\Public\Git\Get-Commit.ps1
 
         $TestParams = $SharedParams
         $TestParams["RepositoryId"] = "6dc5bd8c-7c9a-4050-8a29-107111ac6b44"

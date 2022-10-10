@@ -1,7 +1,7 @@
 <#
     .NOTES
     Requires a PAT token with the following permissions: Build (Read); Release (Read, write, & execute)
-    
+
     API Reference: https://docs.microsoft.com/en-us/rest/api/azure/devops/release/releases/create?view=azure-devops-rest-5.0
 #>
 function New-Release {
@@ -24,7 +24,7 @@ function New-Release {
         [string]$PatToken,
 
         #(Optional) The name of the branch in the primary artefact that will be released.  If not specified then the default version for the primary artefact will be used.
-        [Parameter(Mandatory=$false)]    
+        [Parameter(Mandatory=$false)]
         [string]$PrimaryArtifactBranchName
     )
 
@@ -34,8 +34,8 @@ function New-Release {
             definitionId = $ReleaseDefinitionId
             description = "Requested via API call using PAT token."
             isDraft = $false
-            reason = "none"   
-            manualEnvironments = $null       
+            reason = "none"
+            manualEnvironments = $null
         }
 
         if ($PrimaryArtifactBranchName) {
@@ -44,7 +44,7 @@ function New-Release {
             $GetReleaseDefinitionParams = @{
                 Instance = $Instance
                 PatToken = $PatToken
-                ProjectName = $ProjectName  
+                ProjectName = $ProjectName
                 DefinitionId = $ReleaseDefinitionId
             }
 
@@ -55,7 +55,7 @@ function New-Release {
             $GetBuildParams = @{
                 Instance = $Instance
                 PatToken = $PatToken
-                ProjectId = $ProjectName  
+                ProjectId = $ProjectName
                 BranchName = $PrimaryArtifactBranchName
                 BuildDefinitionId = $ReleaseDefinition.PrimaryArtifact.BuildDefinitionId
             }
@@ -68,9 +68,9 @@ function New-Release {
             catch {
 
                 throw "No build found for branch: $PrimaryArtifactBranchName of primary artifact: $($ReleaseDefinition.PrimaryArtifact.Alias)"
-                
+
             }
-            
+
             Write-Verbose -Message "Setting primary artefact for release to BuildNumber: $($LatestBuild.BuildNumber) \ BuildId: $($LatestBuild.BuildId)"
 
             $Body["artifacts"] = @(
@@ -96,7 +96,7 @@ function New-Release {
             HttpBody = $Body
         }
 
-        $ReleaseJson = Invoke-VstsRestMethod @NewReleaseParams
+        $ReleaseJson = Invoke-AzDevOpsRestMethod @NewReleaseParams
 
         $Release = New-ReleaseObject -ReleaseJson $ReleaseJson
 

@@ -42,7 +42,7 @@ function Get-TestRun {
                 buildIds = $BuildId
             }
         }
-        $TestRunJson = Invoke-VstsRestMethod @GetTestRunParams
+        $TestRunJson = Invoke-AzDevOpsRestMethod @GetTestRunParams
 
         $TestRuns = @()
         if ($TestRunJson.Count -gt 0) {

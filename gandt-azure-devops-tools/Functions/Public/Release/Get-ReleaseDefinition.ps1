@@ -4,10 +4,10 @@ function Get-ReleaseDefinition {
         #The Visual Studio Team Services account name
         [Parameter(Mandatory=$true)]
         [string]$Instance,
-        
+
         #A PAT token with the necessary scope to invoke the requested HttpMethod on the specified Resource
         [Parameter(Mandatory=$true)]
-        [string]$PatToken,   
+        [string]$PatToken,
 
         #Parameter Description
         [Parameter(Mandatory=$true, ParameterSetName="ProjectId")]
@@ -35,12 +35,12 @@ function Get-ReleaseDefinition {
         [Parameter(Mandatory=$true, ParameterSetName="Path")]
         [string]$DefinitionPath
     )
-    
+
     begin {
 
         if(!$ProjectId) {
 
-            $Project = Get-VstsProject -ProjectName $ProjectName -Instance $Instance -PatToken $PatToken -Verbose:$VerbosePreference
+            $Project = Get-AzDevOpsProject -ProjectName $ProjectName -Instance $Instance -PatToken $PatToken -Verbose:$VerbosePreference
             $ProjectId = $Project.Id
 
         }
@@ -76,7 +76,7 @@ function Get-ReleaseDefinition {
 
         }
 
-        $ListDefinitionsJson = Invoke-VstsRestMethod @ListDefinitionsParams
+        $ListDefinitionsJson = Invoke-AzDevOpsRestMethod @ListDefinitionsParams
 
         if ($PSCmdlet.ParameterSetName -eq "Path") {
 
@@ -103,31 +103,31 @@ function Get-ReleaseDefinition {
 
             }
             else {
-                
+
                 $Definition = New-ReleaseDefinitionObject -DefinitionJson $ListDefinitionsJson
 
             }
 
             , $Definition
-        
+
         }
         elseif($ListDefinitionsJson | Get-Member -Name releaseNameFormat) {
 
             $Definition = New-ReleaseDefinitionObject -DefinitionJson $ListDefinitionsJson
 
             , $Definition
-        
+
         }
         elseif ($ListDefinitionsJson.count -gt 1 -and $ListDefinitionsJson.value.GetType().BaseType.ToString() -eq "System.Array") {
 
             $Definitions = @()
-            
+
             foreach ($Definition in $ListDefinitionsJson.value) {
 
                 $Definitions += New-ReleaseDefinitionObject -DefinitionJson $Definition
 
             }
-            
+
             $Definitions
 
         }
@@ -138,7 +138,7 @@ function Get-ReleaseDefinition {
         }
 
     }
-    
+
 }
 
 function New-ReleaseDefinitionObject {
@@ -150,7 +150,7 @@ function New-ReleaseDefinitionObject {
         if (!($DefinitionJson | Get-Member -Name count)) {
 
             $Definition = New-Object -TypeName ReleaseDefinition
-    
+
             $Definition.Id = $DefinitionJson.id
             $Definition.Name = $DefinitionJson.name
             $Definition.Path = $DefinitionJson.path
@@ -159,6 +159,6 @@ function New-ReleaseDefinitionObject {
             $Definition.PrimaryArtifact.BuildDefinitionId = ($DefinitionJson.artifacts | Where-Object {$_.isPrimary -eq $true -and $_.Type -eq "Build"}).definitionReference.definition.id
 
             $Definition
-        
+
         }
 }

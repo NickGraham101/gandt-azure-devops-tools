@@ -6,7 +6,7 @@ function Get-ReleaseArtifacts {
         Long description
     .EXAMPLE
         PS C:\> Get-ReleasedArtifacts -Project myproject -ReleaseEnvironment PROD -Instance myvstsinstance -PatToken "xxxxxxxxxxx" -MostRecentRelease -Verbose
-        Retrieves the artifacts used in the most recent successful deployment to the PROD environment 
+        Retrieves the artifacts used in the most recent successful deployment to the PROD environment
     .INPUTS
         Inputs (if any)
     .OUTPUTS
@@ -15,7 +15,7 @@ function Get-ReleaseArtifacts {
         Api reference: https://docs.microsoft.com/en-us/rest/api/vsts/git/repositories/list?view=vsts-rest-5.0
             list releases: https://docs.microsoft.com/en-us/rest/api/vsts/release/releases/list
             OR
-            list deployments: 
+            list deployments:
             get release definition: https://docs.microsoft.com/en-us/rest/api/vsts/release/releases/get%20release%20definition%20summary
 #>
     [CmdletBinding()]
@@ -50,7 +50,7 @@ function Get-ReleaseArtifacts {
     )
 
     # Get project
-    $Project = Get-VstsProject -Instance $Instance -PatToken $PatToken -ProjectName $ProjectName
+    $Project = Get-AzDevOpsProject -Instance $Instance -PatToken $PatToken -ProjectName $ProjectName
 
     # Get release
     if($MostRecentDeployment.IsPresent) {
@@ -80,7 +80,7 @@ function Get-ReleaseArtifacts {
                 Collection = $Project.id
                 Area = "git"
                 Resource = "repositories"
-                ResourceId = $RepositoryId 
+                ResourceId = $RepositoryId
                 ResourceComponent = "items"
                 ApiVersion = "4.1"
                 AdditionalUriParameters = @{
@@ -90,7 +90,7 @@ function Get-ReleaseArtifacts {
                 }
             }
 
-            $Items = Invoke-VstsRestMethod @GetListItemsParams
+            $Items = Invoke-AzDevOpsRestMethod @GetListItemsParams
 
         }
         elseif ($artifactCollection.type -eq "Git") {
