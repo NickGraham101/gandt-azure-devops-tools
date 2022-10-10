@@ -61,7 +61,7 @@ function Get-Deployment {
             }
         }
 
-        $DeploymentsList = (Invoke-VstsRestMethod @GetDeploymentsListParams).value
+        $DeploymentsList = (Invoke-AzDevOpsRestMethod @GetDeploymentsListParams).value
         Write-Verbose -Message "Retrieved $($DeploymentsList.Count) deployments"
 
         if($MostRecentDeployment.IsPresent) {

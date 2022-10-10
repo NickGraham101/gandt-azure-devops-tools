@@ -1,7 +1,7 @@
 ##RUN WITH F5 NOT FROM PS prompt
 #$VerbosePreference = "SilentlyContinue"
 $VerbosePreference = "Continue"
-$Classes = Get-ChildItem -Path $PSScriptRoot"\..\VstsTools\Classes\*.ps1"
+$Classes = Get-ChildItem -Path $PSScriptRoot"\..\gandt-azure-devops-tools\Classes\*.ps1"
 Write-Host "Importing $($Classes.Count) classes"
 
 foreach($Class in $Classes) {
@@ -18,18 +18,18 @@ foreach($Class in $Classes) {
         foreach ($MissingClass in $MissingClasses) {
 
             $ClassName = $MissingClass -replace '(Unable to find type \[)(.*)(\])', '$2'
-            $MissingClassFile = Get-Item -Path "$($PSScriptRoot)\..\VstsTools\Classes\$($ClassName).ps1"
+            $MissingClassFile = Get-Item -Path "$($PSScriptRoot)\..\gandt-azure-devops-tools\Classes\$($ClassName).ps1"
             try {
-    
+
                 . $MissingClassFile.FullName
                 Write-Verbose "Loaded missing class $($MissingClassFile.FullName)"
                 . $Class.FullName
-        
+
             }
             catch {
-    
+
                 Write-Warning "Failed to load class $($Class.FullName)"
-    
+
             }
 
         }
@@ -43,13 +43,13 @@ foreach($Class in $Classes) {
 
 }
 
-$Private = Get-ChildItem -Path $PSScriptRoot"\..\VstsTools\Functions\Private\*.ps1"
+$Private = Get-ChildItem -Path $PSScriptRoot"\..\gandt-azure-devops-tools\Functions\Private\*.ps1"
 Write-Host "Importing $($Private.Count) private functions"
 
 foreach($Function in $Private) {
 
     try {
-        
+
         Write-Verbose $Function.FullName
         . $Function.FullName
 
@@ -62,13 +62,13 @@ foreach($Function in $Private) {
 
 }
 
-$Public = Get-ChildItem -Path $PSScriptRoot"\..\VstsTools\Functions\Public\*.ps1" -Recurse
+$Public = Get-ChildItem -Path $PSScriptRoot"\..\gandt-azure-devops-tools\Functions\Public\*.ps1" -Recurse
 Write-Host "Importing $($Public.Count) public functions"
 
 foreach($Function in $Public) {
 
     try {
-        
+
         Write-Verbose $Function.FullName
         . $Function.FullName
 

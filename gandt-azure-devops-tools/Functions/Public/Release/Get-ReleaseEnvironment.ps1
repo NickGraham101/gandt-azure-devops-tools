@@ -1,6 +1,10 @@
-function Get-Release {
+function Get-ReleaseEnvironment {
     [CmdletBinding()]
     param (
+        #Parameter Description
+        [Parameter(Mandatory=$true)]
+        [string]$EnvironmentName,
+
         #Parameter Description
         [Parameter(Mandatory=$true)]
         [string]$ProjectName,
@@ -40,7 +44,7 @@ function Get-Release {
                 ReleaseManager = $true
             }
 
-            $ReleaseList = Invoke-VstsRestMethod @GetReleaseListParams
+            $ReleaseList = Invoke-AzDevOpsRestMethod @GetReleaseListParams
 
             $ReleaseId = ($ReleaseList.value | Where-Object {$_.name -eq $ReleaseName -and $_.releaseDefinition.name -eq $ReleaseDefinitionName}).id
 
@@ -57,43 +61,34 @@ function Get-Release {
             ReleaseManager = $true
         }
 
-        $ReleaseJson = Invoke-VstsRestMethod @GetReleaseParams
+        $ReleaseJson = Invoke-AzDevOpsRestMethod @GetReleaseParams
 
-        $Release = New-ReleaseObject -ReleaseJson $ReleaseJson
+        $ReleaseEnvironment = New-ReleaseEnvironmentObject -ReleaseEnvironmentJson ($ReleaseJson.environments | Where-Object {$_.name -eq $EnvironmentName})
 
-        $Release
+        $ReleaseEnvironment
 
     }
 
 }
-
-function New-ReleaseObject {
+function New-ReleaseEnvironmentObject {
     param(
-        $ReleaseJson
+        $ReleaseEnvironmentJson
     )
 
     # Check that the object is not a collection
-    if (!($ReleaseJson | Get-Member -Name count)) {
+    if (!($ReleaseEnvironmentJson | Get-Member -Name count)) {
 
-        $Release = New-Object -TypeName Release
+        $ReleaseEnvironment = New-Object -TypeName ReleaseEnvironment
 
-        $Release.ReleaseId = $ReleaseJson.id
-        $Release.ReleaseName = $ReleaseJson.name
-        $Release.CreatedOn = $ReleaseJson.createdOn
-        $Release.ReleaseDefintionId = $ReleaseJson.releaseDefinition.id
-        $Release.ReleaseDefintionName = $ReleaseJson.releaseDefinition.name
-        $Release.Artifacts = $ReleaseJson.artifacts
-        $Release.Environments = @()
-        foreach ($Environment in $ReleaseJson.environments) {
-            $ReleaseEnvironment = New-Object -TypeName ReleaseEnvironment
-            $ReleaseEnvironment.Id = $Environment.id
-            $ReleaseEnvironment.Name = $Environment.name
-            $ReleaseEnvironment.ReleaseDefintionId = $Environment.definitionEnvironmentId
-            $Release.Environments += $ReleaseEnvironment
-        }
+        $ReleaseEnvironment.Id = $ReleaseEnvironmentJson.id
+        $ReleaseEnvironment.Name = $ReleaseEnvironmentJson.name
+        $ReleaseEnvironment.Status = $ReleaseEnvironmentJson.status
+        $ReleaseEnvironment.ReleaseId = $ReleaseEnvironmentJson.release.id
+        $ReleaseEnvironment.ReleaseName = $ReleaseEnvironmentJson.release.name
+        $ReleaseEnvironment.ReleaseDefintionId = $ReleaseEnvironmentJson.releaseDefinition.id
+        $ReleaseEnvironment.ReleaseDefinitionName = $ReleaseEnvironmentJson.releaseDefinition.id
 
-
-        $Release
+        $ReleaseEnvironment
 
     }
 }

@@ -1,8 +1,8 @@
 Push-Location -Path $PSScriptRoot\..\
 
 Describe "Get-Build unit tests" -Tag "Unit" {
-    
-    . .\VstsTools\Functions\Private\Invoke-VstsRestMethod.ps1
+
+    . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
 
     $SharedParams = @{
         Instance = "notarealinstance"
@@ -31,13 +31,13 @@ Describe "Get-Build unit tests" -Tag "Unit" {
                                      }
                        },
             "properties":  {
-        
+
                            },
             "tags":  [
-        
+
                      ],
             "validationResults":  [
-        
+
                                   ],
             "plans":  [
                           {
@@ -45,7 +45,7 @@ Describe "Get-Build unit tests" -Tag "Unit" {
                           }
                       ],
             "triggerInfo":  {
-        
+
                             },
             "id":  111,
             "buildNumber":  "20190101.2",
@@ -57,7 +57,7 @@ Describe "Get-Build unit tests" -Tag "Unit" {
             "url":  "https://notarealinstance.visualstudio.com/e35a96be-474c-4958-9c52-145e2dab150e/_apis/build/Builds/111",
             "definition":  {
                                "drafts":  [
-        
+
                                           ],
                                "id":  10,
                                "name":  "notarealproject",
@@ -158,10 +158,10 @@ Describe "Get-Build unit tests" -Tag "Unit" {
             "triggeredByBuild":  null
         }
 '@
-        Mock Invoke-VstsRestMethod { return ConvertFrom-Json $TestJson }
+        Mock Invoke-AzDevOpsRestMethod { return ConvertFrom-Json $TestJson }
 
-        . .\VstsTools\Classes\Build.ps1
-        . .\VstsTools\Functions\Public\Build\Get-Build.ps1
+        . .\gandt-azure-devops-tools\Classes\Build.ps1
+        . .\gandt-azure-devops-tools\Functions\Public\Build\Get-Build.ps1
 
         $TestParams = $SharedParams
         $TestParams["BuildId"] = 111

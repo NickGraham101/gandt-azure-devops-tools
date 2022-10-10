@@ -1,25 +1,25 @@
 Push-Location -Path $PSScriptRoot\..\
 
 Describe "Get-ReleaseArtifacts unit tests" -Tag "Unit" {
-    
-    . .\VstsTools\Classes\Build.ps1
-    . .\VstsTools\Classes\Commit.ps1
-    . .\VstsTools\Classes\ReleaseEnvironment.ps1
-    . .\VstsTools\Classes\Release.ps1
-    . .\VstsTools\Classes\ReleasedArtifact.ps1
-    . .\VstsTools\Classes\VstsProject.ps1
-    . .\VstsTools\Functions\Private\Invoke-VstsRestMethod.ps1
-    . .\VstsTools\Functions\Public\Build\Get-Build.ps1
-    . .\VstsTools\Functions\Public\Core\Get-VstsProject.ps1
-    . .\VstsTools\Functions\Public\Git\Get-Commit.ps1
-    . .\VstsTools\Functions\Public\Release\Get-Deployment.ps1
-    . .\VstsTools\Functions\Public\Release\Get-Release.ps1
 
-    $VstsProject = @{
+    . .\gandt-azure-devops-tools\Classes\Build.ps1
+    . .\gandt-azure-devops-tools\Classes\Commit.ps1
+    . .\gandt-azure-devops-tools\Classes\ReleaseEnvironment.ps1
+    . .\gandt-azure-devops-tools\Classes\Release.ps1
+    . .\gandt-azure-devops-tools\Classes\ReleasedArtifact.ps1
+    . .\gandt-azure-devops-tools\Classes\AzDevOpsProject.ps1
+    . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
+    . .\gandt-azure-devops-tools\Functions\Public\Build\Get-Build.ps1
+    . .\gandt-azure-devops-tools\Functions\Public\Core\Get-AzDevOpsProject.ps1
+    . .\gandt-azure-devops-tools\Functions\Public\Git\Get-Commit.ps1
+    . .\gandt-azure-devops-tools\Functions\Public\Release\Get-Deployment.ps1
+    . .\gandt-azure-devops-tools\Functions\Public\Release\Get-Release.ps1
+
+    $AzDevOpsProject = @{
         Id = "notarealprojectid"
         Name = "notarealprojectname"
     }
-    Mock Get-VstsProject { return New-Object -TypeName VstsProject -Property $VstsProject }
+    Mock Get-AzDevOpsProject { return New-Object -TypeName AzDevOpsProject -Property $AzDevOpsProject }
 
     $SharedParams = @{
         Instance = "notarealinstance"
@@ -33,7 +33,7 @@ Describe "Get-ReleaseArtifacts unit tests" -Tag "Unit" {
             RepositoryId = "17fe7887-236e-4394-9f30-34ec9c3ca54c"
         }
         Mock Get-Build { return New-Object -TypeName Build -Property $BuildProperties }
-        
+
         $CommitProperties = @{
             CommitId = "2afda5892fc4441afa316bae334d36bd"
         }
@@ -95,9 +95,9 @@ Describe "Get-ReleaseArtifacts unit tests" -Tag "Unit" {
                       ]
         }
 '@
-        Mock Invoke-VstsRestMethod { return ConvertFrom-Json $TestJson }
+        Mock Invoke-AzDevOpsRestMethod { return ConvertFrom-Json $TestJson }
 
-        . .\VstsTools\Functions\Public\Combined\Get-ReleaseArtifacts.ps1 -Verbose
+        . .\gandt-azure-devops-tools\Functions\Public\Combined\Get-ReleaseArtifacts.ps1 -Verbose
 
         $TestParams = $SharedParams
         $TestParams["ReleaseDefinitionName"] = "notarealdefinition"

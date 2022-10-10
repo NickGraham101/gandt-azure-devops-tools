@@ -4,7 +4,7 @@ function New-Deployment {
         #The ReleaseEnvironmentId, the id of the environment within the release (as opposed to the id of the environment within the release definition)
         [Parameter(Mandatory=$true, ParameterSetName="Name")]
         [int]$EnvironmentId,
-    
+
         #Parameter Description
         [Parameter(Mandatory=$true, ParameterSetName="Name")]
         [string]$ReleaseId,
@@ -25,7 +25,7 @@ function New-Deployment {
     process {
 
         $Body = @{
-            comment = "Requested via API call using PAT token." 
+            comment = "Requested via API call using PAT token."
             status = "inProgress"
         }
 
@@ -44,7 +44,7 @@ function New-Deployment {
             HttpBody = $Body
         }
 
-        $DeploymentJson = Invoke-VstsRestMethod @NewDeploymentParams
+        $DeploymentJson = Invoke-AzDevOpsRestMethod @NewDeploymentParams
 
         $ReleaseEnvironment = New-ReleaseEnvironmentObject -ReleaseEnvironmentJson $DeploymentJson
 

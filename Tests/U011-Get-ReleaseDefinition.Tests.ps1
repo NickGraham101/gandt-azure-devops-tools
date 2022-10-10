@@ -1,9 +1,9 @@
 Push-Location -Path $PSScriptRoot\..\
 
 Describe "Get-ReleaseDefinition unit tests" -Tag "Unit" {
-    
-    . .\VstsTools\Classes\PipelineArtifact.ps1
-    . .\VstsTools\Functions\Private\Invoke-VstsRestMethod.ps1
+
+    . .\gandt-azure-devops-tools\Classes\PipelineArtifact.ps1
+    . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
 
     $SharedParams = @{
         Instance = "notarealinstance"
@@ -165,9 +165,9 @@ Describe "Get-ReleaseDefinition unit tests" -Tag "Unit" {
                     "isRetained": false
                 },
                 {
-                    "sourceId": "d6875a0d-7a10-43c8-8e15-6c6cedb1b15e:notarealinstance/VstsTools",
+                    "sourceId": "d6875a0d-7a10-43c8-8e15-6c6cedb1b15e:notarealinstance/AzDevOps",
                     "type": "GitHub",
-                    "alias": "_notarealinstance_VstsTools",
+                    "alias": "_notarealinstance_AzDevOps",
                     "definitionReference": "@{artifactSourceDefinitionUrl=; branch=; checkoutSubmodules=; connection=; defaultVersionSpecific=; defaultVersionType=; definition=; fetchDepth=; gitLfsSupport=}",
                     "isRetained": false
                 }
@@ -203,10 +203,10 @@ Describe "Get-ReleaseDefinition unit tests" -Tag "Unit" {
         }
 '@
 
-        Mock Invoke-VstsRestMethod { return ConvertFrom-Json $TestJson }
+        Mock Invoke-AzDevOpsRestMethod { return ConvertFrom-Json $TestJson }
 
-        . .\VstsTools\Classes\ReleaseDefinition.ps1
-        . .\VstsTools\Functions\Public\Release\Get-ReleaseDefinition.ps1
+        . .\gandt-azure-devops-tools\Classes\ReleaseDefinition.ps1
+        . .\gandt-azure-devops-tools\Functions\Public\Release\Get-ReleaseDefinition.ps1
 
         $TestParams = $SharedParams
         $TestParams["DefinitionId"] = 10

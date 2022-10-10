@@ -1,6 +1,6 @@
 Push-Location -Path $PSScriptRoot\..\
 
-Describe "Invoke-VstsRestMethod unit tests" -Tag "Unit" {
+Describe "Invoke-AzDevOpsRestMethod unit tests" -Tag "Unit" {
 
     $SharedParams = @{
         Instance = "notarealinstance"
@@ -16,33 +16,33 @@ Describe "Invoke-VstsRestMethod unit tests" -Tag "Unit" {
     It "If no HttpBody passed in it should call Invoke-RestMethod without the Body parameter" {
         Mock Invoke-RestMethod
 
-        . .\VstsTools\Functions\Private\Format-EscapedUri.ps1
-        . .\VstsTools\Functions\Private\Invoke-VstsRestMethod.ps1
-        
-        Invoke-VstsRestMethod @SharedParams
+        . .\gandt-azure-devops-tools\Functions\Private\Format-EscapedUri.ps1
+        . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
+
+        Invoke-AzDevOpsRestMethod @SharedParams
         Assert-MockCalled Invoke-RestMethod -Exactly 1
         Assert-MockCalled Invoke-RestMethod -Times 0 -ParameterFilter { $Body -ne $null }
-        
+
     }
 
     It "If no HttpBody passed in it should call Invoke-RestMethod without the Body parameter" {
         Mock Invoke-RestMethod
 
-        . .\VstsTools\Functions\Private\Format-EscapedUri.ps1
-        . .\VstsTools\Functions\Private\Invoke-VstsRestMethod.ps1
+        . .\gandt-azure-devops-tools\Functions\Private\Format-EscapedUri.ps1
+        . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
 
         $TestParams = $SharedParams
         $TestParams["HttpBody"] = @{
             definitionId = 123
             description = "Requested via API call using PAT token."
             isDraft = $false
-            reason = "none"   
-            manualEnvironments = $null       
+            reason = "none"
+            manualEnvironments = $null
         }
 
-        Invoke-VstsRestMethod @SharedParams
+        Invoke-AzDevOpsRestMethod @SharedParams
         Assert-MockCalled Invoke-RestMethod -Times 1 -ParameterFilter { $Body -ne $null }
-        
+
     }
 
 }

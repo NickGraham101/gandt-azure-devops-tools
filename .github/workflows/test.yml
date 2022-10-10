@@ -32,7 +32,7 @@ jobs:
         Install-Module Pester -RequiredVersion 4.10.0
     - name: Invoke Tests
       shell: pwsh
-      run: Tests/Invoke-Tests.ps1 -CodeCoveragePath ../VstsTools/**/*.ps1
+      run: Tests/Invoke-Tests.ps1 -CodeCoveragePath ./gandt-azure-devops-tools/**/*.ps1
     - name: Publish Unit Test Results
       uses: EnricoMi/publish-unit-test-result-action/composite@v1
       if: always()

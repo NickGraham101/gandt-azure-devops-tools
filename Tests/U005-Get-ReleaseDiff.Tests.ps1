@@ -1,8 +1,8 @@
 Push-Location -Path $PSScriptRoot\..\
 
 Describe "Get-ReleaseDiff unit tests" -Tag "Unit" {
-    
-    . .\VstsTools\Functions\Private\Invoke-VstsRestMethod.ps1
+
+    . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
 
     $SharedParams = @{
         Instance = "notarealinstance"
@@ -15,9 +15,9 @@ Describe "Get-ReleaseDiff unit tests" -Tag "Unit" {
         $TestJson = @'
 '@
 
-        Mock Invoke-VstsRestMethod { return ConvertFrom-Json $TestJson }
+        Mock Invoke-AzDevOpsRestMethod { return ConvertFrom-Json $TestJson }
 
-        . .\VstsTools\Functions\Public\Combined\Get-ReleaseDiff.ps1
+        . .\gandt-azure-devops-tools\Functions\Public\Combined\Get-ReleaseDiff.ps1
 
         $TestParams = $SharedParams
 

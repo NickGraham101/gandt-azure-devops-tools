@@ -1,4 +1,4 @@
-$script:ModuleGitHubRepo = "https://github.com/NickGraham101/VstsTools/issues"
+$script:ModuleGitHubRepo = "https://github.com/NickGraham101/gandt-azure-devops-tools/issues"
 
 $Classes = Get-ChildItem -Path "$($PSScriptRoot)\Classes\*.ps1" -Verbose:$VerbosePreference
 
@@ -17,15 +17,15 @@ foreach($Class in $Classes) {
             $ClassName = $MissingClass -replace '(Unable to find type \[)(.*)(\])', '$2'
             $MissingClassFile = Get-Item -Path "$($PSScriptRoot)\Classes\$($ClassName).ps1"
             try {
-    
+
                 . $MissingClassFile.FullName
                 . $Class.FullName
-        
+
             }
             catch {
-    
+
                 Write-Warning "Failed to load class $($Class.FullName)"
-    
+
             }
 
         }

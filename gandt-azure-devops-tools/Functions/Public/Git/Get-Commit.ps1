@@ -8,11 +8,11 @@ function Get-Commit {
         #The Visual Studio Team Services account name
         [Parameter(Mandatory=$true)]
         [string]$Instance,
-        
+
         #A PAT token with the necessary scope to invoke the requested HttpMethod on the specified Resource
         [Parameter(Mandatory=$true)]
-        [string]$PatToken,  
-        
+        [string]$PatToken,
+
         #Parameter Description
         [Parameter(Mandatory=$true)]
         [string]$ProjectId,
@@ -25,7 +25,7 @@ function Get-Commit {
         [Parameter(Mandatory=$true)]
         [string]$CommitId
     )
-    
+
     process {
 
         $GetCommitParams = @{
@@ -40,14 +40,14 @@ function Get-Commit {
             ApiVersion = "4.1"
         }
 
-        $CommitJson = Invoke-VstsRestMethod @GetCommitParams
+        $CommitJson = Invoke-AzDevOpsRestMethod @GetCommitParams
 
         $Commit = New-CommitObject -CommitJson $CommitJson
 
         $Commit
 
     }
-    
+
 }
 
 function New-CommitObject {
@@ -59,7 +59,7 @@ function New-CommitObject {
         if (!($CommitJson | Get-Member -Name count)) {
 
             $Commit = New-Object -TypeName Commit
-  
+
             $Commit.CommitId = $CommitJson.commitId
             $Commit.Comment = $CommitJson.comment
             $Commit.PushDate = $CommitJson.push.date
@@ -67,6 +67,6 @@ function New-CommitObject {
             $Commit.Parents = $CommitJson.parents
 
             $Commit
-        
+
         }
 }

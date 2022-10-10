@@ -1,8 +1,8 @@
 Push-Location -Path $PSScriptRoot\..\
 
 Describe "New-Deployment unit tests" -Tag "Unit" {
-    
-    . .\VstsTools\Functions\Private\Invoke-VstsRestMethod.ps1
+
+    . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
 
     $SharedParams = @{
         Instance = "notarealinstance"
@@ -10,7 +10,7 @@ Describe "New-Deployment unit tests" -Tag "Unit" {
         ProjectName = "notarealproject"
     }
 
-    It "Will call Invoke-VstsRestMethod with the PATCH HttpMethod and return a ReleaseEnvironment object" {
+    It "Will call Invoke-AzDevOpsRestMethod with the PATCH HttpMethod and return a ReleaseEnvironment object" {
         $TestJson = @'
         {
             "id": 999,
@@ -146,7 +146,7 @@ Describe "New-Deployment unit tests" -Tag "Unit" {
             "variableGroups": [
                 {
                     "variables": "@{SecretOne=; SecretTwo=;}",
-                    "type": "Vsts",
+                    "type": "AzDevOps",
                     "id": 1,
                     "name": "AVariableGroup",
                     "description": "A description",
@@ -156,9 +156,9 @@ Describe "New-Deployment unit tests" -Tag "Unit" {
             ],
             "artifacts": [
                 {
-                    "sourceId": "3bbdecb1-ff63-4665-baab-3d7547ef5827:notarealinstance/VstsTools",
+                    "sourceId": "3bbdecb1-ff63-4665-baab-3d7547ef5827:notarealinstance/AzDevOps",
                     "type": "GitHub",
-                    "alias": "_notarealinstance_VstsTools",
+                    "alias": "_notarealinstance_AzDevOps",
                     "definitionReference": "@{artifactSourceDefinitionUrl=; branch=; checkoutSubmodules=; connection=; definition=; fetchDepth=; gitLfsSupport=; version=; artifactSourceVersionUrl=}",
                     "isRetained": false
                 },
@@ -208,18 +208,18 @@ Describe "New-Deployment unit tests" -Tag "Unit" {
         }
 '@
 
-        Mock Invoke-VstsRestMethod { return ConvertFrom-Json $TestJson }
+        Mock Invoke-AzDevOpsRestMethod { return ConvertFrom-Json $TestJson }
 
-        . .\VstsTools\Classes\ReleaseEnvironment.ps1
-        . .\VstsTools\Functions\Public\Release\Get-ReleaseEnvironment.ps1
-        . .\VstsTools\Functions\Public\Release\New-Deployment.ps1
+        . .\gandt-azure-devops-tools\Classes\ReleaseEnvironment.ps1
+        . .\gandt-azure-devops-tools\Functions\Public\Release\Get-ReleaseEnvironment.ps1
+        . .\gandt-azure-devops-tools\Functions\Public\Release\New-Deployment.ps1
 
         $TestParams = $SharedParams
         $TestParams["EnvironmentId"] = 706
         $TestParams["ReleaseId"] = "999"
 
         $Output = New-Deployment @TestParams
-        Assert-MockCalled -CommandName Invoke-VstsRestMethod -Times 1 -ParameterFilter { $HttpMethod -eq "PATCH" -and $HttpBody.comment -eq "Requested via API call using PAT token."  -and $HttpBody.status -eq "inProgress" }
+        Assert-MockCalled -CommandName Invoke-AzDevOpsRestMethod -Times 1 -ParameterFilter { $HttpMethod -eq "PATCH" -and $HttpBody.comment -eq "Requested via API call using PAT token."  -and $HttpBody.status -eq "inProgress" }
         $Output.GetType().Name | Should Be "ReleaseEnvironment"
     }
 
