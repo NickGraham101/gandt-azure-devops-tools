@@ -43,6 +43,7 @@ jobs:
       run: Tests/Out-TestResults.ps1 -CoveragePercent 65 -Verbose
   tag:
     name: Push Git Tag
+    if: github.event_name != 'schedule'
     needs: [test]
     runs-on: ubuntu-latest
     steps:
