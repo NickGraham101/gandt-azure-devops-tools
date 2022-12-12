@@ -72,6 +72,7 @@ function New-PullRequestObject {
         $PullRequest.PullRequestId = $PullRequestJson.pullRequestId
         $PullRequest.Description = $PullRequestJson.description
         $PullRequest.Title = $PullRequestJson.title
+        $PullRequest.SourceBranchRef = $PullRequestJson.sourceRefName
 
         $PullRequest
 
