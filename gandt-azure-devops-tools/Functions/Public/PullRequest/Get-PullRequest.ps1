@@ -1,9 +1,9 @@
 function Get-PullRequest {
-    <#
+<#
     .NOTES
     API Reference: https://learn.microsoft.com/en-us/rest/api/azure/devops/git/pull-requests/get-pull-request?view=azure-devops-rest-5.0
 #>
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = "None")]
     param (
         #The Visual Studio Team Services account name
         [Parameter(Mandatory = $true)]
@@ -22,13 +22,13 @@ function Get-PullRequest {
         [string]$RepositoryId,
 
         #Parameter Description
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true, ParameterSetName = "Id")]
         [string]$PullRequestId
     )
 
     process {
 
-        $GetCommitParams = @{
+        $GetPullRequestParams = @{
             Instance            = $Instance
             PatToken            = $PatToken
             Collection          = $Project.id
@@ -36,18 +36,27 @@ function Get-PullRequest {
             Resource            = "repositories"
             ResourceId          = $RepositoryId
             ResourceComponent   = "pullrequests"
-            ResourceComponentId = $PullRequestId
             ApiVersion          = "5.0"
         }
 
-        $PullRequestJson = Invoke-AzDevOpsRestMethod @GetCommitParams
+        if ($PSCmdlet.ParameterSetName -eq "Id") {
+            $GetPullRequestParams["ResourceComponentId"] = $PullRequestId
+        }
 
-        $PullRequest = New-PullRequestObject -PullRequestJson $PullRequestJson
+        $PullRequestJson = Invoke-AzDevOpsRestMethod @GetPullRequestParams
+        $PullRequests = @()
 
-        $PullRequest
+        if ($PSCmdlet.ParameterSetName -eq "Id") {
+            $PullRequests += New-PullRequestObject -PullRequestJson $PullRequestJson
+        }
+        else {
+            foreach ($Item in $PullRequestJson.value) {
+                $PullRequests += New-PullRequestObject -PullRequestJson $Item
+            }
+        }
 
+        $PullRequests
     }
-
 }
 
 function New-PullRequestObject {
