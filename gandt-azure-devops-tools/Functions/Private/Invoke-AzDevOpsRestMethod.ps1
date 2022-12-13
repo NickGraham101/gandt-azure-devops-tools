@@ -144,7 +144,7 @@ function Invoke-AzDevOpsRestMethod {
 
     }
 
-    $Uri = "https://$Instance$Vsrm.visualstudio.com/$Collection$TeamProject/_apis/$($Area)$($Resource)$($ResourceId)$($ResourceComponent)$($ResourceSubComponent)$($ResourceComponentId)?api-version=$($ApiVersion)$($UriParams)"
+    $Uri = "https://$Instance$Vsrm.visualstudio.com/$Collection$TeamProject/_apis/$($Area)$($Resource)$($ResourceId)$($ResourceComponent)$($ResourceComponentId)$($ResourceSubComponent)?api-version=$($ApiVersion)$($UriParams)"
     $Uri = [uri]::EscapeUriString($Uri)
     if ($PSVersionTable.PSVersion -lt [System.Version]::new(6,0)) {
 
