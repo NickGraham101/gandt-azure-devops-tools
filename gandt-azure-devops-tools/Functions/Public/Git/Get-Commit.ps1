@@ -22,8 +22,12 @@ function Get-Commit {
         [string]$RepositoryId,
 
         #Parameter Description
-        [Parameter(Mandatory=$true)]
-        [string]$CommitId
+        [Parameter(Mandatory=$true, ParameterSetName = "CommitId")]
+        [string]$CommitId,
+
+        #The name of the branch rather than the git ref, ie "master" not "refs/heads/master"
+        [Parameter(Mandatory=$true, ParameterSetName = "BranchName")]
+        [string]$BranchName
     )
 
     process {
@@ -36,13 +40,30 @@ function Get-Commit {
             Resource = "repositories"
             ResourceId = $RepositoryId
             ResourceComponent = "commits"
-            ResourceComponentId = $CommitId
-            ApiVersion = "4.1"
+            ApiVersion = "5.0"
+        }
+
+        if ($PSCmdlet.ParameterSetName -eq "CommitId") {
+            $GetCommitParams["ResourceComponentId"] = $CommitId
+        }
+        elseif ($PSCmdlet.ParameterSetName -eq "BranchName") {
+            $GetCommitParams["AdditionalUriParameters"] = @{
+                "searchCriteria.itemVersion.version" = $BranchName
+                "searchCriteria.`$top" = 1
+            }
+        }
+        else {
+            throw "ParameterSet not implemented"
         }
 
         $CommitJson = Invoke-AzDevOpsRestMethod @GetCommitParams
 
-        $Commit = New-CommitObject -CommitJson $CommitJson
+        if ($PSCmdlet.ParameterSetName -eq "CommitId") {
+            $Commit = New-CommitObject -CommitJson $CommitJson
+        }
+        else {
+            $Commit = New-CommitObject -CommitJson $CommitJson.value[0]
+        }
 
         $Commit
 
@@ -62,7 +83,7 @@ function New-CommitObject {
 
             $Commit.CommitId = $CommitJson.commitId
             $Commit.Comment = $CommitJson.comment
-            $Commit.PushDate = $CommitJson.push.date
+            $Commit.PushDate = $CommitJson.push.date ? $CommitJson.push.date : [DateTime]::MinValue
             $Commit.TreeId = $CommitJson.treeId
             $Commit.Parents = $CommitJson.parents
 
