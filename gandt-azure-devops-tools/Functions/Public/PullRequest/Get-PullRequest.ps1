@@ -31,7 +31,7 @@ function Get-PullRequest {
         $GetPullRequestParams = @{
             Instance            = $Instance
             PatToken            = $PatToken
-            Collection          = $Project.id
+            Collection          = $ProjectId
             Area                = "git"
             Resource            = "repositories"
             ResourceId          = $RepositoryId
