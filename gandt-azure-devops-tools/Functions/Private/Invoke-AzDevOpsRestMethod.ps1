@@ -80,9 +80,13 @@ function Invoke-AzDevOpsRestMethod {
         [ValidateSet("GET", "HEAD", "PUT", "POST", "PATCH")]
         [string]$HttpMethod = "GET",
 
-        #Optional.  Used in conjunction with PUT and POST HTTP Methods.
+        #Optional.  Hashtable to be used in as Body in conjunction with PUT and POST HTTP Methods.
         [Parameter(Mandatory=$false)]
-        [hashtable]$HttpBody
+        [hashtable]$HttpBody,
+
+        #Optional.  JSON string to be used in as Body in conjunction with PUT and POST HTTP Methods.
+        [Parameter(Mandatory=$false)]
+        [string]$HttpBodyString
     )
 
     <#
@@ -156,14 +160,19 @@ function Invoke-AzDevOpsRestMethod {
 
     }
     Write-Verbose -Message "Invoking URI: $Uri"
-    if(!$HttpBody) {
+    if(!$HttpBody -and !$HttpBodyString) {
 
         $Result = Invoke-RestMethod -Method $HttpMethod -Uri $Uri -Headers @{Authorization = 'Basic ' + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(":$($PatToken)"))} -UseBasicParsing
 
     }
     else {
 
-        $JsonBody = $HttpBody | ConvertTo-Json -Depth 10
+        if ($HttpBody) {
+            $JsonBody = $HttpBody | ConvertTo-Json -Depth 10
+        }
+        else {
+            $JsonBody = $HttpBodyString
+        }
         Write-Verbose -Message "$($HttpMethod)ing body of`n$JsonBody"
         $Result = Invoke-RestMethod -Method $HttpMethod -Uri $Uri -Headers @{Authorization = 'Basic ' + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(":$($PatToken)"))} -Body $JsonBody -ContentType application/json -UseBasicParsing
 
