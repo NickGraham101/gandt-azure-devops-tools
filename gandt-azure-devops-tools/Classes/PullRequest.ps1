@@ -3,4 +3,5 @@ class PullRequest {
     [string]$Description
     [string]$Title
     [string]$SourceBranchRef
+    [string]$LastMergeSourceCommit
 }

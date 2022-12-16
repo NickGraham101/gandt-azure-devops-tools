@@ -29,14 +29,14 @@ function Get-PullRequest {
     process {
 
         $GetPullRequestParams = @{
-            Instance            = $Instance
-            PatToken            = $PatToken
-            Collection          = $ProjectId
-            Area                = "git"
-            Resource            = "repositories"
-            ResourceId          = $RepositoryId
-            ResourceComponent   = "pullrequests"
-            ApiVersion          = "5.0"
+            Instance          = $Instance
+            PatToken          = $PatToken
+            Collection        = $ProjectId
+            Area              = "git"
+            Resource          = "repositories"
+            ResourceId        = $RepositoryId
+            ResourceComponent = "pullrequests"
+            ApiVersion        = "5.0"
         }
 
         if ($PSCmdlet.ParameterSetName -eq "Id") {
@@ -73,6 +73,7 @@ function New-PullRequestObject {
         $PullRequest.Description = $PullRequestJson.description
         $PullRequest.Title = $PullRequestJson.title
         $PullRequest.SourceBranchRef = $PullRequestJson.sourceRefName
+        $PullRequest.LastMergeSourceCommit = $PullRequestJson.lastMergeSourceCommit.commitId
 
         $PullRequest
 
