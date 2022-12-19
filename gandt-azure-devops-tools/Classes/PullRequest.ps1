@@ -4,4 +4,5 @@ class PullRequest {
     [string]$Title
     [string]$SourceBranchRef
     [string]$LastMergeSourceCommit
+    [string[]]$Labels
 }

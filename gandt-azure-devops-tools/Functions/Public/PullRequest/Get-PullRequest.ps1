@@ -2,6 +2,7 @@ function Get-PullRequest {
 <#
     .NOTES
     API Reference: https://learn.microsoft.com/en-us/rest/api/azure/devops/git/pull-requests/get-pull-request?view=azure-devops-rest-5.0
+                   https://learn.microsoft.com/en-us/rest/api/azure/devops/git/pull-request-labels/list?view=azure-devops-rest-5.0
 #>
     [CmdletBinding(DefaultParameterSetName = "None")]
     param (
@@ -46,12 +47,19 @@ function Get-PullRequest {
         $PullRequestJson = Invoke-AzDevOpsRestMethod @GetPullRequestParams
         $PullRequests = @()
 
+        $GetLabelsParams = $GetPullRequestParams + @{
+            ResourceSubComponent = "labels"
+        }
+
         if ($PSCmdlet.ParameterSetName -eq "Id") {
-            $PullRequests += New-PullRequestObject -PullRequestJson $PullRequestJson
+            $Labels = Invoke-AzDevOpsRestMethod @GetLabelsParams
+            $PullRequests += New-PullRequestObject -PullRequestJson $PullRequestJson -Labels $Labels
         }
         else {
             foreach ($Item in $PullRequestJson.value) {
-                $PullRequests += New-PullRequestObject -PullRequestJson $Item
+                $GetLabelsParams["ResourceComponentId"] = $Item.pullRequestId
+                $Labels = Invoke-AzDevOpsRestMethod @GetLabelsParams
+                $PullRequests += New-PullRequestObject -PullRequestJson $Item -Labels $Labels
             }
         }
 
@@ -61,7 +69,11 @@ function Get-PullRequest {
 
 function New-PullRequestObject {
     param(
-        $PullRequestJson
+        [Parameter(Mandatory = $true)]
+        $PullRequestJson,
+
+        [Parameter(Mandatory = $false)]
+        $Labels
     )
 
     # Check that the object is not a collection
@@ -74,6 +86,7 @@ function New-PullRequestObject {
         $PullRequest.Title = $PullRequestJson.title
         $PullRequest.SourceBranchRef = $PullRequestJson.sourceRefName
         $PullRequest.LastMergeSourceCommit = $PullRequestJson.lastMergeSourceCommit.commitId
+        $PullRequest.Labels = $Labels.value.name
 
         $PullRequest
 
