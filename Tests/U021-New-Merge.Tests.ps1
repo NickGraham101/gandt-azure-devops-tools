@@ -27,7 +27,8 @@ Describe "New-Merge unit tests" -Tag "Unit" {
         {
             "detailedStatus": {
                 "mergeCommitId": "def456"
-            }
+            },
+            "status": "completed"
         }
 '@
         Mock Invoke-AzDevOpsRestMethod -ParameterFilter { $ResourceComponent -eq "merges" -and $HttpMethod -ne "POST" } -MockWith { return ConvertFrom-Json $GetMergeJson }
@@ -45,6 +46,8 @@ Describe "New-Merge unit tests" -Tag "Unit" {
         Mock Invoke-AzDevOpsRestMethod -ParameterFilter { $ResourceComponent -eq "refs" -and $HttpMethod -eq "POST" } -MockWith { return ConvertFrom-Json $UpdateRefsJson }
 
 
+        . .\gandt-azure-devops-tools\Classes\Branch.ps1
+        . .\gandt-azure-devops-tools\Functions\Public\Git\New-Branch.ps1
         . .\gandt-azure-devops-tools\Functions\Public\Git\New-Merge.ps1
 
         $TestParams = $SharedParams
