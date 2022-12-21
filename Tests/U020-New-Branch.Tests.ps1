@@ -3,6 +3,7 @@ Push-Location -Path $PSScriptRoot\..\
 Describe "New-Branch unit tests" -Tag "Unit" {
 
     . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
+    . .\gandt-azure-devops-tools\Classes\Commit.ps1
     . .\gandt-azure-devops-tools\Functions\Public\Git\Get-Commit.ps1
 
     $SharedParams = @{
@@ -36,6 +37,7 @@ Describe "New-Branch unit tests" -Tag "Unit" {
             }
         }
 
+        . .\gandt-azure-devops-tools\Classes\Branch.ps1
         . .\gandt-azure-devops-tools\Functions\Public\Git\New-Branch.ps1
 
         $TestParams = $SharedParams
