@@ -26,6 +26,10 @@ function Merge-MultiplePullRequest {
         #Parameter Description
         [Parameter(Mandatory = $false)]
         [string]$DefaultBranchName = "refs/heads/master",
+
+        #Parameter Description
+        [Parameter(Mandatory = $false)]
+        [string[]]$LabelsToInclude
     )
 
     $InformationPreference = 'Continue'
@@ -49,7 +53,14 @@ function Merge-MultiplePullRequest {
         # check if PR built successfully
         $PolicyEvaluation = Get-PullRequestPolicyEvaluation @BaseParams -PullRequestId $PullRequest.PullRequestId
 
-        # check for ignore labels
+        # check for included labels
+        foreach ($Label in $LabelsToInclude) {
+            if ($PullRequest.Labels -notcontains $Label) {
+                continue
+            }
+        }
+
+        # check for ignored labels
         ##TO DO: implement this later
 
         if ($PolicyEvaluation.Status -eq "approved") {
