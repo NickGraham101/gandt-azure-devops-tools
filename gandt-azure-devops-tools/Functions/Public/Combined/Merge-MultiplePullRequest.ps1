@@ -1,4 +1,4 @@
-#function Merge-MultiplePullRequest {
+function Merge-MultiplePullRequest {
 <#
 #>
     [CmdletBinding()]
@@ -21,11 +21,11 @@
 
         #Parameter Description
         [Parameter(Mandatory = $true)]
-        [string]$PullRequestBranchName,
+        [string]$MergedPullRequestBranchName,
 
         #Parameter Description
-        [Parameter(Mandatory = $true)]
-        [string]$DestinationBranchName
+        [Parameter(Mandatory = $false)]
+        [string]$DefaultBranchName = "refs/heads/master",
     )
 
     $InformationPreference = 'Continue'
@@ -46,9 +46,6 @@
     $BranchesToMerge = @()
 
     foreach ($PullRequest in $PullRequests) {
-        # get branch name
-        ##TO DO: not sure this is needed
-
         # check if PR built successfully
         $PolicyEvaluation = Get-PullRequestPolicyEvaluation @BaseParams -PullRequestId $PullRequest.PullRequestId
 
@@ -57,6 +54,7 @@
 
         if ($PolicyEvaluation.Status -eq "approved") {
             $BranchesToMerge += @{
+                PullRequestId = $PullRequest.PullRequestId
                 SourceBranchName = $PullRequest.SourceBranchRef
                 SourceCommitId = $PullRequest.LastMergeSourceCommit
             }
@@ -69,23 +67,37 @@
     }
 
     # create a branch to merge to
-    Write-Information "Retrieved $($BranchesToMerge.Count) branches to merge, creating merge branch $PullRequestBranchName"
-    ##TO DO: decide on naming convention for dependabot branches
-    $CombinedBranch = New-Branch @BaseParams -NewBranchName $PullRequestBranchName -SourceBranchName ($DestinationBranchName -split "/")[-1]
+    Write-Information "Retrieved $($BranchesToMerge.Count) branches to merge, creating merge branch $MergedPullRequestBranchName"
+    $SourceBranchName = "$(($DefaultBranchName -split "/")[-1])"
+    $NewBranchParams = $BaseParams + @{
+        NewBranchName = $MergedPullRequestBranchName
+        SourceBranchName = $SourceBranchName
+    }
+    $CombinedBranch = New-Branch @NewBranchParams
 
     foreach ($Branch in $BranchesToMerge) {
-        Write-Information "Merging branch $($Branch.SourceBranchName) into $DestinationBranchName"
+        Write-Information "Merging branch $($Branch.SourceBranchName) into $CombinedBranch"
+        Remove-Variable -Name MergeCommit -ErrorAction SilentlyContinue
         $MergeParams = $BaseParams + @{
-            Comment = "Merge branch $($Branch.SourceBranchName) into $DestinationBranchName"
+            Comment = "Merge branch $($Branch.SourceBranchName) into $CombinedBranch"
             BranchCommit = $($Branch.SourceCommitId)
             DestinationBranchName = $CombinedBranch.Name
             DestinationCommit = $CombinedBranch.CommitId
         }
-        New-Merge @MergeParams
+        $MergeCommit = New-Merge @MergeParams
+        if ($MergeCommit) {
+            Close-PullRequest @BaseParams -PullRequestId $Branch.PullRequestId
+            ##TO DO: ensure branch is cleaned up
+        }
     }
 
-    ##TO DO: create PR
+    $PullRequestParams = $BaseParams + @{
+        PullRequestTitle = "Merge $($CombinedBranch.Name) into master"
+        PullRequestDescription = "- $($PullRequests.Title -join "`n- ")"
+        SourceBranchRef = $($CombinedBranch.Name)
+        TargetBranchRef = $DefaultBranchName
+    }
+    $StagingPullRequest = New-PullRequest @PullRequestParams
 
-    ##TO DO: check whether dependabot PRs are closed off
-
-#}
+    $StagingPullRequest
+}
