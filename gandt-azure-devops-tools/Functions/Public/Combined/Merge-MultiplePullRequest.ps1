@@ -42,8 +42,7 @@ function Merge-MultiplePullRequest {
     }
 
     ##TO DO: figure out how to manually clean up 'test merge' commit before continuing with testing
-
-    ##TO DO: decide whether to get all PRs and filter out later or get by label
+    # requires garbage collection which isn't supported by AzDevOps
 
     # get all Pull Requests
     $PullRequests = Get-PullRequest @BaseParams
