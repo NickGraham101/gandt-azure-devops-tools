@@ -33,24 +33,19 @@ Describe "Merge-MultiplePullRequest unit tests" -Tag "Unit" {
         }
     }
 
-    ##. .\gandt-azure-devops-tools\Functions\Public\Combined\Merge-MultiplePullRequest.ps1
+    $SharedParams = @{
+        Instance = "notarealinstance"
+        PatToken = "not-a-real-token"
+        ProjectId = "notarealproject"
+        RepositoryId = "1234"
+        MergedPullRequestBranchName = "FOO-4321"
+    }
 
-    Context "some test" {
-        It "Will return a PullRequest object" {
-            $SharedParams = @{
-                Instance = "notarealinstance"
-                PatToken = "not-a-real-token"
-                ProjectId = "notarealproject"
-                RepositoryId = "1234"
-                MergedPullRequestBranchName = "FOO-4321"
-            }
+    It "Will return a PullRequest object" {
+        $TestParams = $SharedParams
 
-            $TestParams = $SharedParams
-
-            $Output = Merge-MultiplePullRequest @SharedParams
-            $Output.GetType().Name | Should Be "PullRequest"
-            #$Output.SourceBranchRef | Should Be "refs/head/foo"
-        }
+        $Output = Merge-MultiplePullRequest @TestParams
+        $Output.GetType().Name | Should Be "PullRequest"
     }
 
 }
