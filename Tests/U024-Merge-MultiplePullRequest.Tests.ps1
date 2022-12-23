@@ -25,6 +25,7 @@ Describe "Merge-MultiplePullRequest unit tests" -Tag "Unit" {
         return New-Object -TypeName Branch
     }
     Mock Close-PullRequest -ModuleName gandt-azure-devops-tools
+    Mock Remove-Branch -ModuleName gandt-azure-devops-tools
     Mock New-PullRequest -ModuleName gandt-azure-devops-tools -MockWith {
         return New-Object -TypeName PullRequest -Property @{
             PullRequestId = "124"

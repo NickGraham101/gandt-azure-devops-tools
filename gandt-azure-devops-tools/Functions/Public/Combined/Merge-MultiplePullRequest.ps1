@@ -65,7 +65,7 @@ function Merge-MultiplePullRequest {
         if ($PolicyEvaluation.Status -eq "approved") {
             $BranchesToMerge += @{
                 PullRequestId = $PullRequest.PullRequestId
-                SourceBranchName = $PullRequest.SourceBranchRef
+                SourceBranchRef = $PullRequest.SourceBranchRef
                 SourceCommitId = $PullRequest.LastMergeSourceCommit
             }
         }
@@ -86,10 +86,10 @@ function Merge-MultiplePullRequest {
     $CombinedBranch = New-Branch @NewBranchParams
 
     foreach ($Branch in $BranchesToMerge) {
-        Write-Information "Merging branch $($Branch.SourceBranchName) into $CombinedBranch"
+        Write-Information "Merging branch $($Branch.SourceBranchRef) into $CombinedBranch"
         Remove-Variable -Name MergeCommit -ErrorAction SilentlyContinue
         $MergeParams = $BaseParams + @{
-            Comment = "Merge branch $($Branch.SourceBranchName) into $CombinedBranch"
+            Comment = "Merge branch $($Branch.SourceBranchRef) into $CombinedBranch"
             BranchCommit = $($Branch.SourceCommitId)
             DestinationBranchName = $CombinedBranch.Name
             DestinationCommit = $CombinedBranch.CommitId
@@ -97,7 +97,7 @@ function Merge-MultiplePullRequest {
         $MergeCommit = New-Merge @MergeParams
         if ($MergeCommit) {
             Close-PullRequest @BaseParams -PullRequestId $Branch.PullRequestId
-            ##TO DO: ensure branch is cleaned up
+            Remove-Branch @BaseParams -BranchName $Branch.SourceBranchRef
         }
     }
 
