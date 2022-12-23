@@ -46,6 +46,9 @@ Describe "Merge-MultiplePullRequest unit tests" -Tag "Unit" {
 
         $Output = Merge-MultiplePullRequest @TestParams
         $Output.GetType().Name | Should Be "PullRequest"
+        Assert-MockCalled -CommandName Close-PullRequest -ModuleName gandt-azure-devops-tools -Exactly -Times 1
+        Assert-MockCalled -CommandName Remove-Branch -ModuleName gandt-azure-devops-tools -Exactly -Times 1
+        Assert-MockCalled -CommandName New-PullRequest -ModuleName gandt-azure-devops-tools -Exactly -Times 1
     }
 
 }
