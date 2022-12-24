@@ -4,11 +4,19 @@ Import-Module "$PSScriptRoot/../gandt-azure-devops-tools/gandt-azure-devops-tool
 Describe "Merge-MultiplePullRequest unit tests" -Tag "Unit" {
 
     Mock Get-PullRequest -ModuleName gandt-azure-devops-tools -MockWith {
-        return New-Object -TypeName PullRequest -Property @{
-            PullRequestId = "123"
-            SourceBranchRef = "refs/heads/foo"
-            LastMergeSourceCommit = "0000000000000000000000000000000000000001"
-        }
+        return @(
+            $(New-Object -TypeName PullRequest -Property @{
+                PullRequestId = "123"
+                SourceBranchRef = "refs/heads/foo"
+                LastMergeSourceCommit = "0000000000000000000000000000000000000001"
+                Labels = @("foo")
+            }),
+            $(New-Object -TypeName PullRequest -Property @{
+                PullRequestId = "124"
+                SourceBranchRef = "refs/heads/bar"
+                LastMergeSourceCommit = "0000000000000000000000000000000000000"
+            })
+        )
     }
     Mock Get-PullRequestPolicyEvaluation -ModuleName gandt-azure-devops-tools -MockWith {
         return New-Object -TypeName PullRequestPolicyEvaluation -Property @{
@@ -39,6 +47,7 @@ Describe "Merge-MultiplePullRequest unit tests" -Tag "Unit" {
         ProjectId = "notarealproject"
         RepositoryId = "1234"
         MergedPullRequestBranchName = "FOO-4321"
+        LabelsToInclude = "foo"
     }
 
     It "Will return a PullRequest object" {
@@ -50,5 +59,4 @@ Describe "Merge-MultiplePullRequest unit tests" -Tag "Unit" {
         Assert-MockCalled -CommandName Remove-Branch -ModuleName gandt-azure-devops-tools -Exactly -Times 1
         Assert-MockCalled -CommandName New-PullRequest -ModuleName gandt-azure-devops-tools -Exactly -Times 1
     }
-
 }
