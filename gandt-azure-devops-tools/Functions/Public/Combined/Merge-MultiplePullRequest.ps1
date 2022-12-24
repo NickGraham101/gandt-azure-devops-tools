@@ -101,7 +101,7 @@ function Merge-MultiplePullRequest {
         $MergeCommit = New-Merge @MergeParams
         if ($MergeCommit) {
             Close-PullRequest @BaseParams -PullRequestId $Branch.PullRequestId
-            Remove-Branch @BaseParams -BranchName $Branch.SourceBranchRef
+            Remove-Branch @BaseParams -BranchName $($Branch.SourceBranchRef -replace "refs/heads/", "")
         }
     }
 
