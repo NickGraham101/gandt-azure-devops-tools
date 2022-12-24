@@ -49,9 +49,6 @@ function Merge-MultiplePullRequest {
     $BranchesToMerge = @()
 
     foreach ($PullRequest in $PullRequests) {
-        # check if PR built successfully
-        $PolicyEvaluation = Get-PullRequestPolicyEvaluation @BaseParams -PullRequestId $PullRequest.PullRequestId
-
         # check for included labels
         $SkipBranch = $true
         foreach ($Label in $LabelsToInclude) {
@@ -66,6 +63,8 @@ function Merge-MultiplePullRequest {
         # check for ignored labels
         ##TO DO: implement this later
 
+        # check if PR built successfully
+        $PolicyEvaluation = Get-PullRequestPolicyEvaluation @BaseParams -PullRequestId $PullRequest.PullRequestId
         if ($PolicyEvaluation.Status -eq "approved") {
             $BranchesToMerge += @{
                 PullRequestId = $PullRequest.PullRequestId
