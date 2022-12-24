@@ -8,13 +8,13 @@ Describe "Merge-MultiplePullRequest unit tests" -Tag "Unit" {
             $(New-Object -TypeName PullRequest -Property @{
                 PullRequestId = "123"
                 SourceBranchRef = "refs/heads/foo"
-                LastMergeSourceCommit = "0000000000000000000000000000000000000001"
+                LastMergeSourceCommit = "0000000000000000000000000000000000000123"
                 Labels = @("foo")
             }),
             $(New-Object -TypeName PullRequest -Property @{
                 PullRequestId = "124"
                 SourceBranchRef = "refs/heads/bar"
-                LastMergeSourceCommit = "0000000000000000000000000000000000000"
+                LastMergeSourceCommit = "0000000000000000000000000000000000000124"
             })
         )
     }
