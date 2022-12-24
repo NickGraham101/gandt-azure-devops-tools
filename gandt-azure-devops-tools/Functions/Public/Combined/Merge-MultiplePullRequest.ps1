@@ -70,6 +70,7 @@ function Merge-MultiplePullRequest {
                 PullRequestId = $PullRequest.PullRequestId
                 SourceBranchRef = $PullRequest.SourceBranchRef
                 SourceCommitId = $PullRequest.LastMergeSourceCommit
+                Title = $PullRequest.Title
             }
         }
     }
@@ -106,7 +107,7 @@ function Merge-MultiplePullRequest {
 
     $PullRequestParams = $BaseParams + @{
         PullRequestTitle = "Merge $($CombinedBranch.Name) into master"
-        PullRequestDescription = "- $($PullRequests.Title -join "`n- ")"
+        PullRequestDescription = "- $($BranchesToMerge.Title -join "`n- ")"
         SourceBranchRef = $($CombinedBranch.Name)
         TargetBranchRef = $DefaultBranchName
     }
