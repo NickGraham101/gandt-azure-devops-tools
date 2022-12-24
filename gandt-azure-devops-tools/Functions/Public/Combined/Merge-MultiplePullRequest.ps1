@@ -53,10 +53,14 @@ function Merge-MultiplePullRequest {
         $PolicyEvaluation = Get-PullRequestPolicyEvaluation @BaseParams -PullRequestId $PullRequest.PullRequestId
 
         # check for included labels
+        $SkipBranch = $true
         foreach ($Label in $LabelsToInclude) {
-            if ($PullRequest.Labels -notcontains $Label) {
-                continue
+            if ($PullRequest.Labels -contains $Label) {
+                $SkipBranch = $false
             }
+        }
+        if ($SkipBranch) {
+            continue
         }
 
         # check for ignored labels
