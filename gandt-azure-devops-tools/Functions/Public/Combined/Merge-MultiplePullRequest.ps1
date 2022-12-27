@@ -29,7 +29,15 @@ function Merge-MultiplePullRequest {
 
         #Parameter Description
         [Parameter(Mandatory = $false)]
-        [string[]]$LabelsToInclude
+        [string[]]$LabelsToInclude,
+
+        #Parameter Description
+        [Parameter(Mandatory = $false)]
+        [int]$PolicyEvaluationRetries = 5,
+
+        #Parameter Description
+        [Parameter(Mandatory = $false)]
+        [int]$PolicyEvaluationWaitSeconds= 60
     )
 
     $InformationPreference = 'Continue'
@@ -65,6 +73,15 @@ function Merge-MultiplePullRequest {
 
         # check if PR built successfully
         $PolicyEvaluation = Get-PullRequestPolicyEvaluation @BaseParams -PullRequestId $PullRequest.PullRequestId
+        $Retries = 0
+        while ($PolicyEvaluation.Status -ne "approved") {
+            if ($Retries -gt $PolicyEvaluationRetries) {
+                break
+            }
+            Start-Sleep -Seconds $PolicyEvaluationWaitSeconds
+            $PolicyEvaluation = Get-PullRequestPolicyEvaluation @BaseParams -PullRequestId $PullRequest.PullRequestId
+            $Retries++
+        }
         if ($PolicyEvaluation.Status -eq "approved") {
             $BranchesToMerge += @{
                 PullRequestId = $PullRequest.PullRequestId
