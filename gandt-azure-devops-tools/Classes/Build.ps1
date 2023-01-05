@@ -5,6 +5,8 @@ class Build {
     $BuildDefinitionName
     $DefintionId
     $QueueTime
+    $Reason
     $RepositoryId
     $RepositoryName
+    $ScheduleName
 }
