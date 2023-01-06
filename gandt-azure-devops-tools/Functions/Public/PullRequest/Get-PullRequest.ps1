@@ -1,9 +1,10 @@
 function Get-PullRequest {
-    <#
+<#
     .NOTES
     API Reference: https://learn.microsoft.com/en-us/rest/api/azure/devops/git/pull-requests/get-pull-request?view=azure-devops-rest-5.0
+                   https://learn.microsoft.com/en-us/rest/api/azure/devops/git/pull-request-labels/list?view=azure-devops-rest-5.0
 #>
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = "None")]
     param (
         #The Visual Studio Team Services account name
         [Parameter(Mandatory = $true)]
@@ -22,37 +23,57 @@ function Get-PullRequest {
         [string]$RepositoryId,
 
         #Parameter Description
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true, ParameterSetName = "Id")]
         [string]$PullRequestId
     )
 
     process {
 
-        $GetCommitParams = @{
-            Instance            = $Instance
-            PatToken            = $PatToken
-            Collection          = $Project.id
-            Area                = "git"
-            Resource            = "repositories"
-            ResourceId          = $RepositoryId
-            ResourceComponent   = "pullrequests"
-            ResourceComponentId = $PullRequestId
-            ApiVersion          = "5.0"
+        $GetPullRequestParams = @{
+            Instance          = $Instance
+            PatToken          = $PatToken
+            Collection        = $ProjectId
+            Area              = "git"
+            Resource          = "repositories"
+            ResourceId        = $RepositoryId
+            ResourceComponent = "pullrequests"
+            ApiVersion        = "5.0"
         }
 
-        $PullRequestJson = Invoke-AzDevOpsRestMethod @GetCommitParams
+        if ($PSCmdlet.ParameterSetName -eq "Id") {
+            $GetPullRequestParams["ResourceComponentId"] = $PullRequestId
+        }
 
-        $PullRequest = New-PullRequestObject -PullRequestJson $PullRequestJson
+        $PullRequestJson = Invoke-AzDevOpsRestMethod @GetPullRequestParams
+        $PullRequests = @()
 
-        $PullRequest
+        $GetLabelsParams = $GetPullRequestParams + @{
+            ResourceSubComponent = "labels"
+        }
 
+        if ($PSCmdlet.ParameterSetName -eq "Id") {
+            $Labels = Invoke-AzDevOpsRestMethod @GetLabelsParams
+            $PullRequests += New-PullRequestObject -PullRequestJson $PullRequestJson -Labels $Labels
+        }
+        else {
+            foreach ($Item in $PullRequestJson.value) {
+                $GetLabelsParams["ResourceComponentId"] = $Item.pullRequestId
+                $Labels = Invoke-AzDevOpsRestMethod @GetLabelsParams
+                $PullRequests += New-PullRequestObject -PullRequestJson $Item -Labels $Labels
+            }
+        }
+
+        $PullRequests
     }
-
 }
 
 function New-PullRequestObject {
     param(
-        $PullRequestJson
+        [Parameter(Mandatory = $true)]
+        $PullRequestJson,
+
+        [Parameter(Mandatory = $false)]
+        $Labels
     )
 
     # Check that the object is not a collection
@@ -63,6 +84,9 @@ function New-PullRequestObject {
         $PullRequest.PullRequestId = $PullRequestJson.pullRequestId
         $PullRequest.Description = $PullRequestJson.description
         $PullRequest.Title = $PullRequestJson.title
+        $PullRequest.SourceBranchRef = $PullRequestJson.sourceRefName
+        $PullRequest.LastMergeSourceCommit = $PullRequestJson.lastMergeSourceCommit.commitId
+        $PullRequest.Labels = $Labels.value.name
 
         $PullRequest
 

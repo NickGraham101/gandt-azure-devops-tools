@@ -123,6 +123,7 @@ function New-BuildObject {
         $Build.BuildDefinitionName = $BuildJson.definition.name
         $Build.DefintionId = $BuildJson.definition.id
         $Build.QueueTime = $BuildJson.queueTime
+        $Build.Reason = $BuildJson.reason
         if ($BuildJson.repository.type -eq "GitHub") {
 
             $Build.RepositoryId = $BuildJson.repository.id
@@ -132,6 +133,11 @@ function New-BuildObject {
 
             $Build.RepositoryId = $BuildJson.repository.id
             $Build.RepositoryName = $BuildJson.repository.name
+
+        }
+        if ($BuildJson.reason -eq "schedule") {
+
+            $Build.ScheduleName = $BuildJson.triggerInfo.scheduleName
 
         }
 
