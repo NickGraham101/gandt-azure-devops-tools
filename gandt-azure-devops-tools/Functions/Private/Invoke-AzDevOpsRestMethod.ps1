@@ -80,11 +80,11 @@ function Invoke-AzDevOpsRestMethod {
         [ValidateSet("GET", "HEAD", "PUT", "POST", "PATCH")]
         [string]$HttpMethod = "GET",
 
-        #Optional.  Hashtable to be used in as Body in conjunction with PUT and POST HTTP Methods.
+        #Optional.  Hashtable to be used as Body in conjunction with PUT and POST HTTP Methods.
         [Parameter(Mandatory=$false)]
         [hashtable]$HttpBody,
 
-        #Optional.  JSON string to be used in as Body in conjunction with PUT and POST HTTP Methods.
+        #Optional.  JSON string to be used as Body in conjunction with PUT and POST HTTP Methods.
         [Parameter(Mandatory=$false)]
         [string]$HttpBodyString
     )

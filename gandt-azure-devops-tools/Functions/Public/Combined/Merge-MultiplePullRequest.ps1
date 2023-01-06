@@ -55,9 +55,6 @@ function Merge-MultiplePullRequest {
         RepositoryId = $RepositoryId
     }
 
-    ##TO DO: figure out how to manually clean up 'test merge' commit before continuing with testing
-    # requires garbage collection which isn't supported by AzDevOps
-
     # get all Pull Requests
     $PullRequests = Get-PullRequest @BaseParams
     $BranchesToMerge = @()
