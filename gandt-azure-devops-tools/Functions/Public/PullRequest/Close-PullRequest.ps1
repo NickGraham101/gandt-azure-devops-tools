@@ -2,6 +2,10 @@ function Close-PullRequest {
     <#
         .NOTES
         API Reference: https://learn.microsoft.com/en-us/rest/api/azure/devops/git/pull-requests/update?view=azure-devops-rest-5.0&tabs=HTTP
+
+        Permissions: PAT token or identity that System.AccessToken is derived from will require the
+        following permissions on the repository:
+        - Contribute to Pull Requests
     #>
     [CmdletBinding()]
     param (

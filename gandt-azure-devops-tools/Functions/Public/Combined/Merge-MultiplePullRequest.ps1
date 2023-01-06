@@ -1,5 +1,11 @@
 function Merge-MultiplePullRequest {
 <#
+    .NOTES
+    Permissions: PAT token or identity that System.AccessToken is derived from will require the
+    following permissions on the repository:
+    - Contribute
+    - Contribute to Pull Requests
+    - Create Branch
 #>
     [CmdletBinding()]
     param(
