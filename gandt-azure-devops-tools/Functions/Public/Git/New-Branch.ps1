@@ -40,7 +40,6 @@ function New-Branch {
         $BaseParams = @{
             Instance = $Instance
             PatToken = $PatToken
-            ErrorAction = "Stop" ##TO DO: this doesn't seem to have any effect
         }
 
         $GetCommitParams = $BaseParams + @{
