@@ -65,15 +65,22 @@ jobs:
       id: get-latest-tag
       with:
         semver_only: true
-    - name: Bump tag
+    - name: Bump tag (Label)
       uses: actions-ecosystem/action-bump-semver@v1.0.0
-      id: bump-semver
+      id: bump-semver-label
       if: ${{ steps.release-label.outputs.level != null }}
       with:
         current_version: ${{ steps.get-latest-tag.outputs.tag }}
         level: ${{ steps.release-label.outputs.level }}
+    - name: Bump tag (default)
+      uses: actions-ecosystem/action-bump-semver@v1.0.0
+      id: bump-semver-default
+      if: ${{ steps.release-label.outputs.level == null }}
+      with:
+        current_version: ${{ steps.get-latest-tag.outputs.tag }}
+        level: patch
     - name: Push tag
       uses: actions-ecosystem/action-push-tag@v1.0.0
       if: ${{ success() && github.ref == 'refs/heads/master' }}
       with:
-        tag: ${{ steps.bump-semver.outputs.new_version }}
+        tag: ${{ steps.bump-semver-label.outputs.new_version }} ${{ steps.bump-semver-label-default.outputs.new_version }}
