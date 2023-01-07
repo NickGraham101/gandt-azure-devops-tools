@@ -65,22 +65,28 @@ jobs:
       id: get-latest-tag
       with:
         semver_only: true
-    - name: Bump tag (Label)
+    - name: Bump tag (default)
+      uses: actions-ecosystem/action-bump-semver@v1.0.0
+      id: bump-semver-default
+      with:
+        current_version: ${{ steps.get-latest-tag.outputs.tag }}
+        level: patch
+    - name: Bump tag (label)
       uses: actions-ecosystem/action-bump-semver@v1.0.0
       id: bump-semver-label
       if: ${{ steps.release-label.outputs.level != null }}
       with:
         current_version: ${{ steps.get-latest-tag.outputs.tag }}
         level: ${{ steps.release-label.outputs.level }}
-    - name: Bump tag (default)
-      uses: actions-ecosystem/action-bump-semver@v1.0.0
-      id: bump-semver-default
-      if: ${{ steps.release-label.outputs.level == null }}
-      with:
-        current_version: ${{ steps.get-latest-tag.outputs.tag }}
-        level: patch
+    - name: Set tag variable
+      run: |
+        if [ "${{ steps.bump-semver-label.outputs.new_version }}" ]; then
+          echo "new_version=${{ steps.bump-semver-label.outputs.new_version }}" >> $GITHUB_ENV
+        else
+          echo "new_version=${{ steps.bump-semver-default.outputs.new_version }}" >> $GITHUB_ENV
+        fi
     - name: Push tag
       uses: actions-ecosystem/action-push-tag@v1.0.0
       if: ${{ success() && github.ref == 'refs/heads/master' }}
       with:
-        tag: ${{ steps.bump-semver-label.outputs.new_version }} ${{ steps.bump-semver-label-default.outputs.new_version }}
+        tag: ${{ env.new_version }}
