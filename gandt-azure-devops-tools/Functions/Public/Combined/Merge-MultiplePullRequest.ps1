@@ -25,9 +25,13 @@ function Merge-MultiplePullRequest {
         [Parameter(Mandatory = $true)]
         [string]$RepositoryId,
 
+        #A case sensitive prefix for the new branch.  If a branch matching this pattern already exists it will be reused, if not a new branch will be created.
+        [Parameter(Mandatory = $true)]
+        [string]$MergedPullRequestBranchPrefix,
+
         #Parameter Description
         [Parameter(Mandatory = $true)]
-        [string]$MergedPullRequestBranchName,
+        [string]$MergedPullRequestBranchSuffix,
 
         #Parameter Description
         [Parameter(Mandatory = $false)]
@@ -102,12 +106,19 @@ function Merge-MultiplePullRequest {
 
     # create a branch to merge to
     Write-Information "Retrieved $($BranchesToMerge.Count) branches to merge, creating merge branch $MergedPullRequestBranchName"
-    $SourceBranchName = "$(($DefaultBranchName -split "/")[-1])"
-    $NewBranchParams = $BaseParams + @{
-        NewBranchName = $MergedPullRequestBranchName
-        SourceBranchName = $SourceBranchName
+
+    $CombinedBranch = Get-PullRequest @BaseParams | Where-Object { $_.SourceBranchRef -cmatch "^refs/heads/$MergedPullRequestBranchPrefix.*" }
+    if (!$CombinedBranch) {
+        $SourceBranchName = "$(($DefaultBranchName -split "/")[-1])"
+        $NewBranchParams = $BaseParams + @{
+            NewBranchName = "$MergedPullRequestBranchPrefix-$MergedPullRequestBranchSuffix"
+            SourceBranchName = $SourceBranchName
+        }
+        $CombinedBranch = New-Branch @NewBranchParams
     }
-    $CombinedBranch = New-Branch @NewBranchParams
+    elseif ($CombinedBranch.Count -gt 1) {
+        throw "More than one branch still exists with prefix $MergedPullRequestBranchPrefix.  Merge or abandon PRs and manually clean up branches."
+    }
 
     foreach ($Branch in $BranchesToMerge) {
         Write-Information "Merging branch $($Branch.SourceBranchRef) into $CombinedBranch"

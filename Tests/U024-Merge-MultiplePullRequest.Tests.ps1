@@ -46,7 +46,8 @@ Describe "Merge-MultiplePullRequest unit tests" -Tag "Unit" {
         PatToken = "not-a-real-token"
         ProjectId = "notarealproject"
         RepositoryId = "1234"
-        MergedPullRequestBranchName = "FOO-4321"
+        MergedPullRequestBranchPrefix = "FOO"
+        MergedPullRequestBranchSuffix = "4321"
         LabelsToInclude = "foo"
     }
 
