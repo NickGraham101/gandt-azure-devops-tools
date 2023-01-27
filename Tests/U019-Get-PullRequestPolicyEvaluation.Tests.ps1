@@ -25,7 +25,7 @@ Describe "Get-PullRequestPolicyEvaluation unit tests" -Tag "Unit" {
                     }
                 },
                 {
-                    "completedDate":  "2017-08-01T21:04:05.787Z",
+                    "completedDate":  "",
                     "status": "approved",
                     "context": {
                         "buildDefinitionId": "5432",

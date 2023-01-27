@@ -64,7 +64,7 @@ function New-PolicyEvaluationStatusObject {
         $PullRequestPolicyEvaluation.BuildDefinitionId = $PolicyEvaluationStatusJson.context.buildDefinitionId
         $PullRequestPolicyEvaluation.BuildDefinitionName = $PolicyEvaluationStatusJson.context.buildDefinitionName
         $PullRequestPolicyEvaluation.Status = $PolicyEvaluationStatusJson.status
-        $PullRequestPolicyEvaluation.CompletedDate = $PolicyEvaluationStatusJson.completedDate
+        $PullRequestPolicyEvaluation.CompletedDate = $PolicyEvaluationStatusJson.completedDate ? $PolicyEvaluationStatusJson.completedDate : [DateTime]::MinValue
 
         $PullRequestPolicyEvaluation
 
