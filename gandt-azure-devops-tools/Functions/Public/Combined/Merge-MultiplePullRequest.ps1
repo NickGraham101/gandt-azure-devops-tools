@@ -1,5 +1,12 @@
 function Merge-MultiplePullRequest {
 <#
+    .SYNOPSIS
+    Merges branches whose PRs match specified properties into a new branch, closes off original PRs and raises a new PR.
+    .DESCRIPTION
+    Merges branches whose PRs match specified properties into a new branch, closes off original PRs and raises a new PR.
+
+    By default PR checks must have passed but by adding "/skip-build-check" to the PR description this can be overridden.
+
     .NOTES
     Permissions: PAT token or identity that System.AccessToken is derived from will require the
     following permissions on the repository:
@@ -81,7 +88,7 @@ function Merge-MultiplePullRequest {
         # check if PR built successfully
         $PolicyEvaluation = Get-PullRequestPolicyEvaluation @BaseParams -PullRequestId $PullRequest.PullRequestId
         $Retries = 0
-        while ($PolicyEvaluation.Status -ne "approved") {
+        while ($PolicyEvaluation.Status -notcontains "approved" -and $PullRequest.Description -notmatch "/skip-build-check") {
             if ($Retries -gt $PolicyEvaluationRetries) {
                 break
             }
@@ -89,7 +96,7 @@ function Merge-MultiplePullRequest {
             $PolicyEvaluation = Get-PullRequestPolicyEvaluation @BaseParams -PullRequestId $PullRequest.PullRequestId
             $Retries++
         }
-        if ($PolicyEvaluation.Status -eq "approved") {
+        if ($PolicyEvaluation.Status -eq "approved" -or $PullRequest.Description -match "/skip-build-check") {
             $BranchesToMerge += @{
                 PullRequestId = $PullRequest.PullRequestId
                 SourceBranchRef = $PullRequest.SourceBranchRef
