@@ -5,6 +5,8 @@ Describe "New-Branch unit tests" -Tag "Unit" {
     . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
     . .\gandt-azure-devops-tools\Classes\Commit.ps1
     . .\gandt-azure-devops-tools\Functions\Public\Git\Get-Commit.ps1
+    . .\gandt-azure-devops-tools\Functions\Public\Git\Get-Branch.ps1
+
 
     $SharedParams = @{
         Instance = "notarealinstance"

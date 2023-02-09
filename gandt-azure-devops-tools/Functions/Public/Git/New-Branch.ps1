@@ -76,15 +76,3 @@ function New-Branch {
         $Branch
     }
 }
-
-function New-BranchObject {
-    param(
-        $BranchJson
-    )
-    $Branch = New-Object -TypeName Branch
-
-    $Branch.Name = $BranchJson.name
-    $Branch.CommitId = $BranchJson.newObjectId
-
-    $Branch
-}
