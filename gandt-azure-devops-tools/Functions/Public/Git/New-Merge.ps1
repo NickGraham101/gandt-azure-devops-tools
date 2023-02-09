@@ -41,10 +41,20 @@ function New-Merge {
 
         #The head commit of the target branch
         [Parameter(Mandatory = $true)]
-        [string]$DestinationCommit
+        [string]$DestinationCommit,
+
+        #Parameter Description
+        [Parameter(Mandatory = $false)]
+        [int]$MergeResultRetries = 5,
+
+        #Parameter Description
+        [Parameter(Mandatory = $false)]
+        [int]$MergeResultWaitSeconds= 60
     )
 
     process {
+
+        $InformationPreference = 'Continue'
 
         $BaseParams = @{
             Instance   = $Instance
@@ -75,10 +85,16 @@ function New-Merge {
             ResourceComponentId = $MergeJson.mergeOperationId
         }
 
+        $MergeResult = Invoke-AzDevOpsRestMethod @GetMergeParams
+        $Retries = 0
         while ($MergeResult.status -ne "completed") {
+            Write-Information "Merge result is: $($MergeResult.status), reason is: $($MergeResult.detailedStatus)"
+            if ($Retries -gt $MergeResultRetries) {
+                break
+            }
             $MergeResult = Invoke-AzDevOpsRestMethod @GetMergeParams
-            Start-Sleep -Seconds 5
-            ##TO DO: add a timeout
+            Start-Sleep -Seconds $MergeResultWaitSeconds
+            $Retries++
         }
 
         $UpdateRefsBody = ConvertTo-Json @(@{
