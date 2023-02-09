@@ -114,7 +114,7 @@ function Merge-MultiplePullRequest {
     # create a branch to merge to
     Write-Information "Retrieved $($BranchesToMerge.Count) branches to merge, creating merge branch $MergedPullRequestBranchName"
 
-    $CombinedBranch = Get-PullRequest @BaseParams | Where-Object { $_.SourceBranchRef -cmatch "^refs/heads/$MergedPullRequestBranchPrefix.*" }
+    $CombinedBranch = Get-Branch @BaseParams | Where-Object { $_.Name -cmatch "^refs/heads/$MergedPullRequestBranchPrefix.*" }
     if (!$CombinedBranch) {
         $SourceBranchName = "$(($DefaultBranchName -split "/")[-1])"
         $NewBranchParams = $BaseParams + @{
