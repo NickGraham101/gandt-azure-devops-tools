@@ -9,7 +9,7 @@ function New-Merge {
         - Contribute
     #>
 
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName =  "None")]
     param(
         #The Visual Studio Team Services account name
         [Parameter(Mandatory = $true)]
@@ -49,7 +49,29 @@ function New-Merge {
 
         #Parameter Description
         [Parameter(Mandatory = $false)]
-        [int]$MergeResultWaitSeconds= 60
+        [int]$MergeResultWaitSeconds= 30,
+
+        #Name of the source branch, ie 'refs/heads/feature' rather than  'feature'
+        [Parameter(Mandatory = $true, ParameterSetName = "GitHiresMerge")]
+        [string]$BranchName,
+
+        #Parameter Description
+        [Parameter(Mandatory = $true, ParameterSetName = "GitHiresMerge")]
+        [string]$GitEmail,
+
+        #Parameter Description
+        [Parameter(Mandatory = $true, ParameterSetName = "GitHiresMerge")]
+        [string]$GitUsername,
+
+        #Used when falling back to git-hires-merge
+        [Parameter(Mandatory = $true, ParameterSetName = "GitHiresMerge")]
+        [string]$SourceCodeRootDirectory,
+
+        #Uses git-hires-merge as a fall back merge tool if the normal git merge fails.
+        #When running this from an Azure DevOps pipeline you will need to checkout the repo and set persistCredentials: true
+        #https://github.com/paulaltin/git-hires-merge
+        [Parameter(Mandatory = $false, ParameterSetName = "GitHiresMerge")]
+        [switch]$UseGitHiresMerge
     )
 
     process {
@@ -90,7 +112,45 @@ function New-Merge {
         while ($MergeResult.status -ne "completed") {
             Write-Information "Merge result is: $($MergeResult.status), reason is: $($MergeResult.detailedStatus)"
             if ($Retries -gt $MergeResultRetries) {
-                break
+                if ($UseGitHiresMerge -and $PsVersionTable.Platform -eq "Unix") {
+                    Write-Information "Using git-hires-merge to resolve conflict"
+                    Set-Location $SourceCodeRootDirectory
+                    Write-Information "Checking out source branch:`n$(Invoke-Expression `"git checkout $($BranchName -replace 'refs\/heads\/', '')`")"
+                    Invoke-Expression "git config --global user.email `"$GitEmail`""
+                    Invoke-Expression "git config --global user.name `"$GitUsername`""
+                    Write-Information "Checking out destination:`n$(Invoke-Expression `"git checkout $(($DestinationBranchName -split '/')[-1])`")"
+                    Invoke-Expression "git config --local merge.conflictstyle diff3"
+                    $ManualMergeResult = Invoke-Expression "git merge $BranchName"
+                    Write-Verbose "Manual merge result:`n$ManualMergeResult"
+                    $ConflictedFilePathMatch = Select-String -InputObject $ManualMergeResult -Pattern "(?sm)Merge\sconflict\sin\s([\w\/\.]+)\s"
+                    if ($ConflictedFilePathMatch) {
+                        $ConflictedFilePath = ($ConflictedFilePathMatch | Select-Object -ExpandProperty Matches | Select-Object -ExpandProperty Groups | Select-Object -ExpandProperty Captures)[1].Value
+                        Invoke-WebRequest -Uri https://raw.githubusercontent.com/paulaltin/git-hires-merge/d9531ecba6aff1ec05a68ed0cd6b3d594403d541/git-hires-merge -OutFile git-hires-merge
+                        Invoke-Expression "chmod 755 git-hires-merge"
+                        # export doesn't work inside Invoke-Expression
+                        ##TO DO: remove pwd; ls -ls troubleshooting steps, these were added to identify why the git-hires-merge wasn't downloaded to the correct location on hosted agent
+                        ##TO DO: test for the success of the steps below and return null if any fail
+                        sh -c "pwd; ls -ls;export GIT_HIRES_MERGE_NON_INTERACTIVE_MODE=True;git-hires-merge $ConflictedFilePath"
+                        Invoke-Expression "git add $ConflictedFilePath"
+                        Invoke-Expression "git commit -m `"Merge branch $BranchName into $DestinationBranchName`""
+                        Invoke-Expression "git push"
+
+                        $MergeCommit = New-BranchObject -BranchJson @{
+                            name = "refs/heads/$DestinationBranchName"
+                            newObjectId = "fallback-merge" ##TO DO: get the commit sha
+                        }
+
+                        return $MergeCommit
+                    }
+                    else {
+                        Write-Information "Merge result didn't match pattern, skipping git-hires-merge"
+                        return
+                    }
+                }
+                else {
+                    return
+                }
+
             }
             $MergeResult = Invoke-AzDevOpsRestMethod @GetMergeParams
             Start-Sleep -Seconds $MergeResultWaitSeconds
