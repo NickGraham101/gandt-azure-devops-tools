@@ -14,7 +14,7 @@ function Merge-MultiplePullRequest {
     - Contribute to Pull Requests
     - Create Branch
 #>
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName =  "None")]
     param(
         #The Visual Studio Team Services account name
         [Parameter(Mandatory = $true)]
@@ -54,7 +54,25 @@ function Merge-MultiplePullRequest {
 
         #Parameter Description
         [Parameter(Mandatory = $false)]
-        [int]$PolicyEvaluationWaitSeconds= 60
+        [int]$PolicyEvaluationWaitSeconds= 60,
+
+        #Parameter Description
+        [Parameter(Mandatory = $true, ParameterSetName = "GitHiresMerge")]
+        [string]$GitEmail,
+
+        #Parameter Description
+        [Parameter(Mandatory = $true, ParameterSetName = "GitHiresMerge")]
+        [string]$GitUsername,
+
+        #Used when falling back to git-hires-merge
+        [Parameter(Mandatory = $true, ParameterSetName = "GitHiresMerge")]
+        [string]$SourceCodeRootDirectory,
+
+        #Uses git-hires-merge as a fall back merge tool if the normal git merge fails.
+        #When running this from an Azure DevOps pipeline you will need to checkout the repo and set persistCredentials: true
+        #https://github.com/paulaltin/git-hires-merge
+        [Parameter(Mandatory = $false, ParameterSetName = "GitHiresMerge")]
+        [switch]$UseGitHiresMerge
     )
 
     $InformationPreference = 'Continue'
@@ -94,6 +112,7 @@ function Merge-MultiplePullRequest {
             }
             Start-Sleep -Seconds $PolicyEvaluationWaitSeconds
             $PolicyEvaluation = Get-PullRequestPolicyEvaluation @BaseParams -PullRequestId $PullRequest.PullRequestId
+            Write-Information "Policy evaluation status for pull request $($PullRequest.PullRequestId) is $($PolicyEvaluation.Status)"
             $Retries++
         }
         if ($PolicyEvaluation.Status -eq "approved" -or $PullRequest.Description -match "/skip-build-check") {
@@ -112,7 +131,7 @@ function Merge-MultiplePullRequest {
     }
 
     # create a branch to merge to
-    Write-Information "Retrieved $($BranchesToMerge.Count) branches to merge, creating merge branch $MergedPullRequestBranchName"
+    Write-Information "Retrieved $($BranchesToMerge.Count) branches to merge, creating merge branch $MergedPullRequestBranchName" #TO DO: fix $MergedPullRequestBranchName, it doesn't exist
 
     $CombinedBranch = Get-Branch @BaseParams | Where-Object { $_.Name -cmatch "^refs/heads/$MergedPullRequestBranchPrefix.*" }
     if (!$CombinedBranch) {
@@ -136,10 +155,22 @@ function Merge-MultiplePullRequest {
             DestinationBranchName = $CombinedBranch.Name
             DestinationCommit = $CombinedBranch.CommitId
         }
+        if ($UseGitHiresMerge) {
+            $MergeParams = $MergeParams + @{
+                BranchName = $($Branch.SourceBranchRef)
+                GitEmail = $GitEmail
+                GitUsername = $GitUsername
+                SourceCodeRootDirectory = $SourceCodeRootDirectory
+                UseGitHiresMerge = $true
+            }
+        }
         $MergeCommit = New-Merge @MergeParams
         if ($MergeCommit) {
             Close-PullRequest @BaseParams -PullRequestId $Branch.PullRequestId
             Remove-Branch @BaseParams -BranchName $($Branch.SourceBranchRef -replace "refs/heads/", "")
+        }
+        else {
+            Write-Warning "Merge failed"
         }
     }
 
