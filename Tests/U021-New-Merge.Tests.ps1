@@ -47,7 +47,7 @@ Describe "New-Merge unit tests" -Tag "Unit" {
 
 
         . .\gandt-azure-devops-tools\Classes\Branch.ps1
-        . .\gandt-azure-devops-tools\Functions\Public\Git\New-Branch.ps1
+        . .\gandt-azure-devops-tools\Functions\Public\Git\Get-Branch.ps1
         . .\gandt-azure-devops-tools\Functions\Public\Git\New-Merge.ps1
 
         $TestParams = $SharedParams
