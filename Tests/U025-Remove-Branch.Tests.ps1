@@ -40,7 +40,7 @@ Describe "Remove-Branch unit tests" -Tag "Unit" {
     }
 
     . .\gandt-azure-devops-tools\Classes\Branch.ps1
-    . .\gandt-azure-devops-tools\Functions\Public\Git\New-Branch.ps1
+    . .\gandt-azure-devops-tools\Functions\Public\Git\Get-Branch.ps1
     . .\gandt-azure-devops-tools\Functions\Public\Git\Remove-Branch.ps1
 
     It "Will return a Branch object" {
