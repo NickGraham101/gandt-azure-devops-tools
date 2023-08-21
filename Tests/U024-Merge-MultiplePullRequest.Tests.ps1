@@ -23,6 +23,12 @@ Describe "Merge-MultiplePullRequest unit tests" -Tag "Unit" {
             Status = "approved"
         }
     }
+    Mock Get-Branch -ModuleName gandt-azure-devops-tools -MockWith {
+        return New-Object -TypeName Branch -Property @{
+            Name =  "Bar"
+            CommitId = "0000000000000000000000000000000000000001"
+        }
+    }
     Mock New-Branch -ModuleName gandt-azure-devops-tools -MockWith {
         return New-Object -TypeName Branch -Property @{
             Name =  "Bar"
