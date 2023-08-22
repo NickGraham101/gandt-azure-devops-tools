@@ -165,6 +165,7 @@ function Merge-MultiplePullRequest {
             }
         }
         $MergeCommit = New-Merge @MergeParams
+        Write-Information "Result of merge is:`n$MergeCommit"
         if ($MergeCommit) {
             Close-PullRequest @BaseParams -PullRequestId $Branch.PullRequestId
             Remove-Branch @BaseParams -BranchName $($Branch.SourceBranchRef -replace "refs/heads/", "")
