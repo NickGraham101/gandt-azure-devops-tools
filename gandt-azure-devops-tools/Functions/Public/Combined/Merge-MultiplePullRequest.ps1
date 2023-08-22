@@ -146,6 +146,7 @@ function Merge-MultiplePullRequest {
         throw "More than one branch still exists with prefix $MergedPullRequestBranchPrefix.  Merge or abandon PRs and manually clean up branches."
     }
 
+    $SuccessfulMerges = 0
     foreach ($Branch in $BranchesToMerge) {
         Write-Information "Merging branch $($Branch.SourceBranchRef) into $CombinedBranch"
         Remove-Variable -Name MergeCommit -ErrorAction SilentlyContinue
@@ -169,25 +170,34 @@ function Merge-MultiplePullRequest {
         if ($MergeCommit) {
             Close-PullRequest @BaseParams -PullRequestId $Branch.PullRequestId
             Remove-Branch @BaseParams -BranchName $($Branch.SourceBranchRef -replace "refs/heads/", "")
+            $SuccessfulMerges++
         }
         else {
             Write-Warning "Merge failed"
         }
     }
 
-    $StagingPullRequestTitle = "Merge $($CombinedBranch.Name) into master"
-    $AllPullRequests = Get-PullRequest @BaseParams
-    $StagingPullRequest = $AllPullRequests | Where-Object { $_.Title -eq $StagingPullRequestTitle}
+    if ($SuccessfulMerges -gt 0) {
+        $StagingPullRequestTitle = "Merge $($CombinedBranch.Name) into master"
+        $AllPullRequests = Get-PullRequest @BaseParams
+        $StagingPullRequest = $AllPullRequests | Where-Object { $_.Title -eq $StagingPullRequestTitle}
 
-    if (!$StagingPullRequest) {
-        $NewPullRequestParams = $BaseParams + @{
-            PullRequestTitle = $StagingPullRequestTitle
-            PullRequestDescription = "- $($BranchesToMerge.Title -join "`n- ")"
-            SourceBranchRef = $($CombinedBranch.Name)
-            TargetBranchRef = $DefaultBranchName
+        if (!$StagingPullRequest) {
+            $NewPullRequestParams = $BaseParams + @{
+                PullRequestTitle = $StagingPullRequestTitle
+                PullRequestDescription = "- $($BranchesToMerge.Title -join "`n- ")"
+                SourceBranchRef = $($CombinedBranch.Name)
+                TargetBranchRef = $DefaultBranchName
+            }
+            $StagingPullRequest = New-PullRequest @NewPullRequestParams
         }
-        $StagingPullRequest = New-PullRequest @NewPullRequestParams
-    }
+        else {
+            ##TO DO: update PR description
+        }
 
-    $StagingPullRequest
+        $StagingPullRequest
+    }
+    else {
+        Write-Warning "No merges succeeded!"
+    }
 }
