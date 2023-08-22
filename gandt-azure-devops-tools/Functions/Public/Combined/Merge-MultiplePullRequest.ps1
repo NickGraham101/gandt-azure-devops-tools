@@ -50,11 +50,11 @@ function Merge-MultiplePullRequest {
 
         #Parameter Description
         [Parameter(Mandatory = $false)]
-        [int]$PolicyEvaluationRetries = 5,
+        [int]$PolicyEvaluationRetries = 4,
 
         #Parameter Description
         [Parameter(Mandatory = $false)]
-        [int]$PolicyEvaluationWaitSeconds= 60,
+        [int]$PolicyEvaluationWaitSeconds= 30,
 
         #Parameter Description
         [Parameter(Mandatory = $true, ParameterSetName = "GitHiresMerge")]
