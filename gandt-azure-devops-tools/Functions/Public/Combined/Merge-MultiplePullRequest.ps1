@@ -175,13 +175,19 @@ function Merge-MultiplePullRequest {
         }
     }
 
-    $PullRequestParams = $BaseParams + @{
-        PullRequestTitle = "Merge $($CombinedBranch.Name) into master"
-        PullRequestDescription = "- $($BranchesToMerge.Title -join "`n- ")"
-        SourceBranchRef = $($CombinedBranch.Name)
-        TargetBranchRef = $DefaultBranchName
+    $StagingPullRequestTitle = "Merge $($CombinedBranch.Name) into master"
+    $AllPullRequests = Get-PullRequest @BaseParams
+    $StagingPullRequest = $AllPullRequests | Where-Object { $_.Title -eq $StagingPullRequestTitle}
+
+    if (!$StagingPullRequest) {
+        $NewPullRequestParams = $BaseParams + @{
+            PullRequestTitle = $StagingPullRequestTitle
+            PullRequestDescription = "- $($BranchesToMerge.Title -join "`n- ")"
+            SourceBranchRef = $($CombinedBranch.Name)
+            TargetBranchRef = $DefaultBranchName
+        }
+        $StagingPullRequest = New-PullRequest @NewPullRequestParams
     }
-    $StagingPullRequest = New-PullRequest @PullRequestParams
 
     $StagingPullRequest
 }
