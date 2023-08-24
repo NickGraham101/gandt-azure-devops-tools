@@ -128,12 +128,14 @@ function New-Merge {
                         Invoke-WebRequest -Uri https://raw.githubusercontent.com/paulaltin/git-hires-merge/d9531ecba6aff1ec05a68ed0cd6b3d594403d541/git-hires-merge -OutFile git-hires-merge
                         Invoke-Expression "chmod 755 git-hires-merge"
                         # export doesn't work inside Invoke-Expression
-                        ##TO DO: remove pwd; ls -ls troubleshooting steps, these were added to identify why the git-hires-merge wasn't downloaded to the correct location on hosted agent
-                        ##TO DO: test for the success of the steps below and return null if any fail
-                        sh -c "pwd; ls -ls;export GIT_HIRES_MERGE_NON_INTERACTIVE_MODE=True;git-hires-merge $ConflictedFilePath"
-                        Invoke-Expression "git add $ConflictedFilePath"
-                        Invoke-Expression "git commit -m `"Merge branch $BranchName into $DestinationBranchName`""
-                        Invoke-Expression "git push"
+                        Write-Information($(sh -c "export GIT_HIRES_MERGE_NON_INTERACTIVE_MODE=True;export PYTHONWARNINGS=ignore;./git-hires-merge $ConflictedFilePath") | ConvertTo-Json) -InformationAction Continue
+                        Write-Information $(Invoke-Expression "git add $ConflictedFilePath")
+                        Write-Information $(Invoke-Expression "git commit -m `"Merge branch $BranchName into $DestinationBranchName`"")
+                        Write-Information $(Invoke-Expression "git push")
+                        if ($LASTEXITCODE -ne 0) {
+                            Write-Information "LASTEXITCODE was $LASTEXITCODE, git-hires-merge failed."
+                            return
+                        }
 
                         $MergeCommit = New-BranchObject -BranchJson @{
                             name = "refs/heads/$DestinationBranchName"
