@@ -131,13 +131,14 @@ function Merge-MultiplePullRequest {
     }
 
     # create a branch to merge to
-    Write-Information "Retrieved $($BranchesToMerge.Count) branches to merge, creating merge branch $MergedPullRequestBranchName" #TO DO: fix $MergedPullRequestBranchName, it doesn't exist
+    $MergedPullRequestBranchName = "$MergedPullRequestBranchPrefix-$MergedPullRequestBranchSuffix"
+    Write-Information "Retrieved $($BranchesToMerge.Count) branches to merge, creating merge branch $MergedPullRequestBranchName"
 
     $CombinedBranch = Get-Branch @BaseParams | Where-Object { $_.Name -cmatch "^refs/heads/$MergedPullRequestBranchPrefix.*" }
     if (!$CombinedBranch) {
         $SourceBranchName = "$(($DefaultBranchName -split "/")[-1])"
         $NewBranchParams = $BaseParams + @{
-            NewBranchName = "$MergedPullRequestBranchPrefix-$MergedPullRequestBranchSuffix"
+            NewBranchName = $MergedPullRequestBranchName
             SourceBranchName = $SourceBranchName
         }
         $CombinedBranch = New-Branch @NewBranchParams
@@ -148,7 +149,7 @@ function Merge-MultiplePullRequest {
 
     $SuccessfulMerges = 0
     foreach ($Branch in $BranchesToMerge) {
-        Write-Information "Merging branch $($Branch.SourceBranchRef) into $CombinedBranch"
+        Write-Information "Merging branch $($Branch.SourceBranchRef) into $($CombinedBranch.Name)"
         Remove-Variable -Name MergeCommit -ErrorAction SilentlyContinue
         $MergeParams = $BaseParams + @{
             Comment = "Merge branch $($Branch.SourceBranchRef) into $CombinedBranch"
