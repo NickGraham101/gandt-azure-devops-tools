@@ -152,7 +152,7 @@ function Merge-MultiplePullRequest {
         Write-Information "Merging branch $($Branch.SourceBranchRef) into $($CombinedBranch.Name)"
         Remove-Variable -Name MergeCommit -ErrorAction SilentlyContinue
         $MergeParams = $BaseParams + @{
-            Comment = "Merge branch $($Branch.SourceBranchRef) into $CombinedBranch"
+            Comment = "Merge branch $($Branch.SourceBranchRef) into $($CombinedBranch.Name)"
             BranchCommit = $($Branch.SourceCommitId)
             DestinationBranchName = $CombinedBranch.Name
             DestinationCommit = $CombinedBranch.CommitId
