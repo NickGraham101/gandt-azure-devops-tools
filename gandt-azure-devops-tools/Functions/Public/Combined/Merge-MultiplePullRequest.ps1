@@ -169,8 +169,14 @@ function Merge-MultiplePullRequest {
         $MergeCommit = New-Merge @MergeParams
         Write-Information "Result of merge is:`n$($MergeCommit | ConvertTo-Json)"
         if ($MergeCommit) {
+            Write-Verbose "Closing pull request $($Branch.PullRequestId)"
             Close-PullRequest @BaseParams -PullRequestId $Branch.PullRequestId
+            Write-Verbose "Removing branch $($Branch.SourceBranchRef)"
             Remove-Branch @BaseParams -BranchName $($Branch.SourceBranchRef -replace "refs/heads/", "")
+            $AllBranches = Get-Branch @BaseParams
+            Write-Verbose "Retrieved $($AllBranches.count) branches:`n$($AllBranches | ConvertTo-Json)`nAttempting to match branch $MergedPullRequestBranchName"
+            $CombinedBranch = $AllBranches | Where-Object { $_.Name -match "^$MergedPullRequestBranchName$" }
+            Write-Verbose "Refreshed combined branch $($CombinedBranch.Name)"
             $SuccessfulMerges++
         }
         else {
