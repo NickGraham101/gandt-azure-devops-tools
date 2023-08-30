@@ -129,13 +129,13 @@ function Merge-MultiplePullRequest {
         Write-Warning "Retrieved $($PullRequests.Count) PRs, none match criteria to combine into single PR."
         return
     }
+    Write-Information "Retrieved $($BranchesToMerge.Count) branches to merge"
 
     # create a branch to merge to
-    $MergedPullRequestBranchName = "$MergedPullRequestBranchPrefix-$MergedPullRequestBranchSuffix"
-    Write-Information "Retrieved $($BranchesToMerge.Count) branches to merge, creating merge branch $MergedPullRequestBranchName"
-
     $CombinedBranch = Get-Branch @BaseParams | Where-Object { $_.Name -cmatch "^refs/heads/$MergedPullRequestBranchPrefix.*" }
     if (!$CombinedBranch) {
+        $MergedPullRequestBranchName = "$MergedPullRequestBranchPrefix-$MergedPullRequestBranchSuffix"
+        Write-Information "Creating merge branch $MergedPullRequestBranchName"
         $SourceBranchName = "$(($DefaultBranchName -split "/")[-1])"
         $NewBranchParams = $BaseParams + @{
             NewBranchName = $MergedPullRequestBranchName
@@ -146,6 +146,7 @@ function Merge-MultiplePullRequest {
     elseif ($CombinedBranch.Count -gt 1) {
         throw "More than one branch still exists with prefix $MergedPullRequestBranchPrefix.  Merge or abandon PRs and manually clean up branches."
     }
+    $MergedPullRequestBranchName = $CombinedBranch.Name
 
     $SuccessfulMerges = 0
     foreach ($Branch in $BranchesToMerge) {
@@ -185,7 +186,7 @@ function Merge-MultiplePullRequest {
     }
 
     if ($SuccessfulMerges -gt 0) {
-        $StagingPullRequestTitle = "Merge $($CombinedBranch.Name) into master"
+        $StagingPullRequestTitle = "Merge $MergedPullRequestBranchName into master"
         $AllPullRequests = Get-PullRequest @BaseParams
         $StagingPullRequest = $AllPullRequests | Where-Object { $_.Title -eq $StagingPullRequestTitle}
 
@@ -193,7 +194,7 @@ function Merge-MultiplePullRequest {
             $NewPullRequestParams = $BaseParams + @{
                 PullRequestTitle = $StagingPullRequestTitle
                 PullRequestDescription = "- $($BranchesToMerge.Title -join "`n- ")"
-                SourceBranchRef = $($CombinedBranch.Name)
+                SourceBranchRef = $MergedPullRequestBranchName
                 TargetBranchRef = $DefaultBranchName
             }
             $StagingPullRequest = New-PullRequest @NewPullRequestParams
