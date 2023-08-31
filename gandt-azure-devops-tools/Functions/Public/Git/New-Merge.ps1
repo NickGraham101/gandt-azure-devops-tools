@@ -121,6 +121,8 @@ function New-Merge {
                     Invoke-Expression "git config --global user.name `"$GitUsername`""
                     Write-Verbose "git config:`n$(Invoke-Expression "git config --global -l" | ConvertTo-Json)"
                     Write-Information "Checking out destination:`n$(Invoke-Expression `"git checkout $(($DestinationBranchName -split '/')[-1])`")"
+                    Write-Information $(Invoke-Expression "git fetch" | ConvertTo-Json)
+                    Write-Information $(Invoke-Expression "git pull" | ConvertTo-Json)
                     Invoke-Expression "git config --local merge.conflictstyle diff3"
                     $ManualMergeResult = Invoke-Expression "git merge $BranchName"
                     Write-Verbose "Manual merge result:`n$ManualMergeResult"
