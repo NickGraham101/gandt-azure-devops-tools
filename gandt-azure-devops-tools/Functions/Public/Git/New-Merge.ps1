@@ -55,11 +55,11 @@ function New-Merge {
         [Parameter(Mandatory = $true, ParameterSetName = "GitHiresMerge")]
         [string]$BranchName,
 
-        #Parameter Description
+        #Used to push git-hires-merge, see for configuration: https://learn.microsoft.com/en-us/azure/devops/pipelines/scripts/git-commands?view=azure-devops&tabs=yaml#grant-version-control-permissions-to-the-build-service
         [Parameter(Mandatory = $true, ParameterSetName = "GitHiresMerge")]
         [string]$GitEmail,
 
-        #Parameter Description
+        #Used to push git-hires-merge, see for configuration: https://learn.microsoft.com/en-us/azure/devops/pipelines/scripts/git-commands?view=azure-devops&tabs=yaml#grant-version-control-permissions-to-the-build-service
         [Parameter(Mandatory = $true, ParameterSetName = "GitHiresMerge")]
         [string]$GitUsername,
 
@@ -116,8 +116,10 @@ function New-Merge {
                     Write-Information "Using git-hires-merge to resolve conflict"
                     Set-Location $SourceCodeRootDirectory
                     Write-Information "Checking out source branch:`n$(Invoke-Expression `"git checkout $($BranchName -replace 'refs\/heads\/', '')`")"
+                    Write-Verbose "git config:`n$(Invoke-Expression "git config --global -l" | ConvertTo-Json)"
                     Invoke-Expression "git config --global user.email `"$GitEmail`""
                     Invoke-Expression "git config --global user.name `"$GitUsername`""
+                    Write-Verbose "git config:`n$(Invoke-Expression "git config --global -l" | ConvertTo-Json)"
                     Write-Information "Checking out destination:`n$(Invoke-Expression `"git checkout $(($DestinationBranchName -split '/')[-1])`")"
                     Invoke-Expression "git config --local merge.conflictstyle diff3"
                     $ManualMergeResult = Invoke-Expression "git merge $BranchName"
@@ -129,9 +131,9 @@ function New-Merge {
                         Invoke-Expression "chmod 755 git-hires-merge"
                         # export doesn't work inside Invoke-Expression
                         Write-Information($(sh -c "export GIT_HIRES_MERGE_NON_INTERACTIVE_MODE=True;export PYTHONWARNINGS=ignore;./git-hires-merge $ConflictedFilePath") | ConvertTo-Json) -InformationAction Continue
-                        Write-Information $(Invoke-Expression "git add $ConflictedFilePath")
-                        Write-Information $(Invoke-Expression "git commit -m `"Merge branch $BranchName into $DestinationBranchName`"")
-                        Write-Information $(Invoke-Expression "git push")
+                        Write-Information $(Invoke-Expression "git add $ConflictedFilePath" | ConvertTo-Json)
+                        Write-Information $(Invoke-Expression "git commit -m `"Merge branch $BranchName into $DestinationBranchName`"" | ConvertTo-Json)
+                        Write-Information $(Invoke-Expression "git push" | ConvertTo-Json)
                         if ($LASTEXITCODE -ne 0) {
                             Write-Information "LASTEXITCODE was $LASTEXITCODE, git-hires-merge failed."
                             return
