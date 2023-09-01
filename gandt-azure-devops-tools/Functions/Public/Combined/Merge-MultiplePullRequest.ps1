@@ -171,9 +171,9 @@ function Merge-MultiplePullRequest {
         Write-Information "Result of merge is:`n$($MergeCommit | ConvertTo-Json)"
         if ($MergeCommit) {
             Write-Verbose "Closing pull request $($Branch.PullRequestId)"
-            Close-PullRequest @BaseParams -PullRequestId $Branch.PullRequestId
+            Close-PullRequest @BaseParams -PullRequestId $Branch.PullRequestId | Out-Null
             Write-Verbose "Removing branch $($Branch.SourceBranchRef)"
-            Remove-Branch @BaseParams -BranchName $($Branch.SourceBranchRef -replace "refs/heads/", "")
+            Remove-Branch @BaseParams -BranchName $($Branch.SourceBranchRef -replace "refs/heads/", "") | Out-Null
             $AllBranches = Get-Branch @BaseParams
             Write-Verbose "Retrieved $($AllBranches.count) branches:`n$($AllBranches | ConvertTo-Json)`nAttempting to match branch $MergedPullRequestBranchName"
             $CombinedBranch = $AllBranches | Where-Object { $_.Name -match "^$MergedPullRequestBranchName$" }
@@ -191,6 +191,7 @@ function Merge-MultiplePullRequest {
         $StagingPullRequest = $AllPullRequests | Where-Object { $_.Title -eq $StagingPullRequestTitle}
 
         if (!$StagingPullRequest) {
+            Write-Information "Creating new PR for merge branch $MergedPullRequestBranchName"
             $NewPullRequestParams = $BaseParams + @{
                 PullRequestTitle = $StagingPullRequestTitle
                 PullRequestDescription = "- $($BranchesToMerge.Title -join "`n- ")"
