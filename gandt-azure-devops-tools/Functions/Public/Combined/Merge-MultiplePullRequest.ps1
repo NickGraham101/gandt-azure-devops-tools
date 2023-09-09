@@ -148,7 +148,7 @@ function Merge-MultiplePullRequest {
     }
     $MergedPullRequestBranchName = $CombinedBranch.Name
 
-    $SuccessfulMerges = 0
+    $SuccessfulMerges = @()
     foreach ($Branch in $BranchesToMerge) {
         Write-Information "Merging branch $($Branch.SourceBranchRef) into $($CombinedBranch.Name)"
         Remove-Variable -Name MergeCommit -ErrorAction SilentlyContinue
@@ -178,14 +178,14 @@ function Merge-MultiplePullRequest {
             Write-Verbose "Retrieved $($AllBranches.count) branches:`n$($AllBranches | ConvertTo-Json)`nAttempting to match branch $MergedPullRequestBranchName"
             $CombinedBranch = $AllBranches | Where-Object { $_.Name -match "^$MergedPullRequestBranchName$" }
             Write-Verbose "Refreshed combined branch $($CombinedBranch.Name)"
-            $SuccessfulMerges++
+            $SuccessfulMerges += $Branch
         }
         else {
             Write-Warning "Merge failed"
         }
     }
 
-    if ($SuccessfulMerges -gt 0) {
+    if ($SuccessfulMerges) {
         $StagingPullRequestTitle = "Merge $MergedPullRequestBranchName into master"
         $AllPullRequests = Get-PullRequest @BaseParams
         $StagingPullRequest = $AllPullRequests | Where-Object { $_.Title -eq $StagingPullRequestTitle}
@@ -194,7 +194,7 @@ function Merge-MultiplePullRequest {
             Write-Information "Creating new PR for merge branch $MergedPullRequestBranchName"
             $NewPullRequestParams = $BaseParams + @{
                 PullRequestTitle = $StagingPullRequestTitle
-                PullRequestDescription = "- $($BranchesToMerge.Title -join "`n- ")"
+                PullRequestDescription = "- $($SuccessfulMerges.Title -join "`n- ")"
                 SourceBranchRef = $MergedPullRequestBranchName
                 TargetBranchRef = $DefaultBranchName
             }
