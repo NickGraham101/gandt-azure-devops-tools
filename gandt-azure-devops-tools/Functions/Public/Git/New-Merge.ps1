@@ -140,6 +140,7 @@ function New-Merge {
                         Write-Information $(Invoke-Expression "git push" | ConvertTo-Json)
                         if ($LASTEXITCODE -ne 0) {
                             Write-Information "LASTEXITCODE was $LASTEXITCODE, git-hires-merge failed."
+                            Write-Information $(Invoke-Expression "git reset --hard" | ConvertTo-Json)
                             return
                         }
 
