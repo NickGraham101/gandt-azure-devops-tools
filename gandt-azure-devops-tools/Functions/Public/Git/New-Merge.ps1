@@ -125,14 +125,16 @@ function New-Merge {
                     Write-Information $(Invoke-Expression "git pull" | ConvertTo-Json)
                     Invoke-Expression "git config --local merge.conflictstyle diff3"
                     $ManualMergeResult = Invoke-Expression "git merge $BranchName"
-                    Write-Verbose "Manual merge result:`n$ManualMergeResult"
-                    $ConflictedFilePathMatch = Select-String -InputObject $ManualMergeResult -Pattern "(?sm)Merge\sconflict\sin\s([\w\/\.]+)\s"
-                    if ($ConflictedFilePathMatch) {
-                        $ConflictedFilePath = ($ConflictedFilePathMatch | Select-Object -ExpandProperty Matches | Select-Object -ExpandProperty Groups | Select-Object -ExpandProperty Captures)[1].Value
+                    Write-Information "Manual merge result:`n$ManualMergeResult"
+                    $ConflictedFilePathMatches = Select-String -InputObject $ManualMergeResult -Pattern "(?sm)Merge\sconflict\sin\s([\w\/\.]+)\s" -AllMatches
+                    if ($ConflictedFilePathMatches) {
                         Invoke-WebRequest -Uri https://raw.githubusercontent.com/paulaltin/git-hires-merge/d9531ecba6aff1ec05a68ed0cd6b3d594403d541/git-hires-merge -OutFile git-hires-merge
                         Invoke-Expression "chmod 755 git-hires-merge"
-                        # export doesn't work inside Invoke-Expression
-                        Write-Information($(sh -c "export GIT_HIRES_MERGE_NON_INTERACTIVE_MODE=True;export PYTHONWARNINGS=ignore;./git-hires-merge $ConflictedFilePath") | ConvertTo-Json) -InformationAction Continue
+                        foreach ($ConflictedFilePathMatch in $ConflictedFilePathMatches | Select-Object -ExpandProperty Matches) {
+                            $ConflictedFilePath = ($ConflictedFilePathMatch | Select-Object -ExpandProperty Groups | Select-Object -ExpandProperty Captures)[1].Value
+                            # export doesn't work inside Invoke-Expression
+                            Write-Information($(sh -c "export GIT_HIRES_MERGE_NON_INTERACTIVE_MODE=True;export PYTHONWARNINGS=ignore;./git-hires-merge $ConflictedFilePath") | ConvertTo-Json) -InformationAction Continue
+                        }
                         Write-Information $(Invoke-Expression "git add $ConflictedFilePath" | ConvertTo-Json)
                         Write-Information $(Invoke-Expression "git commit -m `"Merge branch $BranchName into $DestinationBranchName`"" | ConvertTo-Json)
                         Write-Information $(Invoke-Expression "git push" | ConvertTo-Json)
