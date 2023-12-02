@@ -50,8 +50,8 @@ function New-TimelineObject {
 
     $Timeline = New-Object -TypeName Timeline
     $Timeline.BuildId = $BuildId
-    $Timeline.FailedJobs = ($null -ne $TimelineJson.records | Where-Object {$_.Type -eq "Job" -and $_.Result -eq "failed"}) ? $true : $false
-    $Timeline.FailedStages = ($null -ne $TimelineJson.records | Where-Object {$_.Type -eq "Stage" -and $_.Result -eq "failed"}) ? $true : $false
-    $Timeline.FailedTasks = ($null -ne $TimelineJson.records | Where-Object {$_.Type -eq "Task" -and $_.Result -eq "failed"}) ? $true : $false
+    $Timeline.FailedJobs = $null -ne ($TimelineJson.records | Where-Object {$_.Type -eq "Job" -and $_.Result -eq "failed"})
+    $Timeline.FailedStages = $null -ne ($TimelineJson.records | Where-Object {$_.Type -eq "Stage" -and $_.Result -eq "failed"})
+    $Timeline.FailedTasks = $null -ne ($TimelineJson.records | Where-Object {$_.Type -eq "Task" -and $_.Result -eq "failed"})
     $Timeline
 }
