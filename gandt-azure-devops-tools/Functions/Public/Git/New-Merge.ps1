@@ -113,33 +113,41 @@ function New-Merge {
             Write-Information "Merge result is: $($MergeResult.status), reason is: $($MergeResult.detailedStatus)"
             if ($Retries -gt $MergeResultRetries) {
                 if ($UseGitHiresMerge -and $PsVersionTable.Platform -eq "Unix") {
-                    Write-Information "Using git-hires-merge to resolve conflict"
+                    Write-Information "Attepting manual merge"
                     Set-Location $SourceCodeRootDirectory
-                    Write-Information "Checking out source branch:`n$(Invoke-Expression `"git checkout $($BranchName -replace 'refs\/heads\/', '')`")"
+                    Write-Information $(Invoke-Expression "git fetch" | ConvertTo-Json)
+                    $ShortBranchName = $BranchName -replace 'refs\/heads\/', ''
+                    Write-Information "Checking out source branch:`n$(Invoke-Expression `"git checkout $ShortBranchName`")"
                     Write-Verbose "git config:`n$(Invoke-Expression "git config --global -l" | ConvertTo-Json)"
                     Invoke-Expression "git config --global user.email `"$GitEmail`""
                     Invoke-Expression "git config --global user.name `"$GitUsername`""
                     Write-Verbose "git config:`n$(Invoke-Expression "git config --global -l" | ConvertTo-Json)"
-                    Write-Information $(Invoke-Expression "git fetch" | ConvertTo-Json)
                     Write-Information "Checking out destination:`n$(Invoke-Expression `"git checkout $(($DestinationBranchName -split '/')[-1])`")"
                     Write-Information $(Invoke-Expression "git pull" | ConvertTo-Json)
                     Invoke-Expression "git config --local merge.conflictstyle diff3"
-                    $ManualMergeResult = Invoke-Expression "git merge $BranchName"
+                    $ManualMergeResult = Invoke-Expression "git merge $ShortBranchName"
                     Write-Information "Manual merge result:`n$ManualMergeResult"
                     $ConflictedFilePathMatches = Select-String -InputObject $ManualMergeResult -Pattern "(?sm)Merge\sconflict\sin\s([\w\/\.]+)\s" -AllMatches
                     if ($ConflictedFilePathMatches) {
+                        Write-Information "Using git-hires-merge to resolve conflict"
                         Invoke-WebRequest -Uri https://raw.githubusercontent.com/paulaltin/git-hires-merge/d9531ecba6aff1ec05a68ed0cd6b3d594403d541/git-hires-merge -OutFile git-hires-merge
                         Invoke-Expression "chmod 755 git-hires-merge"
                         foreach ($ConflictedFilePathMatch in $ConflictedFilePathMatches | Select-Object -ExpandProperty Matches) {
+                            Write-Information "Resolving conflict for $ConflictedFilePathMatch"
                             $ConflictedFilePath = ($ConflictedFilePathMatch | Select-Object -ExpandProperty Groups | Select-Object -ExpandProperty Captures)[1].Value
                             # export doesn't work inside Invoke-Expression
                             Write-Information($(sh -c "export GIT_HIRES_MERGE_NON_INTERACTIVE_MODE=True;export PYTHONWARNINGS=ignore;./git-hires-merge $ConflictedFilePath") | ConvertTo-Json) -InformationAction Continue
+                            Write-Information $(Invoke-Expression "git add $ConflictedFilePath" | ConvertTo-Json)
                         }
-                        Write-Information $(Invoke-Expression "git add $ConflictedFilePath" | ConvertTo-Json)
                         Write-Information $(Invoke-Expression "git commit -m `"Merge branch $BranchName into $DestinationBranchName`"" | ConvertTo-Json)
+                        if ($LASTEXITCODE -ne 0) {
+                            Write-Information "LASTEXITCODE was $LASTEXITCODE, git-hires-merge or git commit failed."
+                            Write-Information $(Invoke-Expression "git reset --hard" | ConvertTo-Json)
+                            return
+                        }
                         Write-Information $(Invoke-Expression "git push" | ConvertTo-Json)
                         if ($LASTEXITCODE -ne 0) {
-                            Write-Information "LASTEXITCODE was $LASTEXITCODE, git-hires-merge failed."
+                            Write-Information "LASTEXITCODE was $LASTEXITCODE, git push failed."
                             Write-Information $(Invoke-Expression "git reset --hard" | ConvertTo-Json)
                             return
                         }
