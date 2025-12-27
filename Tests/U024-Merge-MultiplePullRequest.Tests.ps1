@@ -15,9 +15,6 @@ Describe "Merge-MultiplePullRequest unit tests" -Tag "Unit" {
             MergedPullRequestBranchSuffix = "4321"
             LabelsToInclude = "foo"
         }
-    }
-
-    It "Will return a PullRequest object" {
 
         . .\gandt-azure-devops-tools\Classes\PullRequest.ps1
         Mock Get-PullRequest -ModuleName gandt-azure-devops-tools -MockWith {
@@ -36,11 +33,7 @@ Describe "Merge-MultiplePullRequest unit tests" -Tag "Unit" {
             )
         }
         . .\gandt-azure-devops-tools\Classes\PullRequestPolicyEvaluation.ps1
-        Mock Get-PullRequestPolicyEvaluation -ModuleName gandt-azure-devops-tools -MockWith {
-            return New-Object -TypeName PullRequestPolicyEvaluation -Property @{
-                Status = "approved"
-            }
-        }
+
         . .\gandt-azure-devops-tools\Classes\Branch.ps1
         Mock Get-Branch -ModuleName gandt-azure-devops-tools -MockWith {
             return New-Object -TypeName Branch -Property @{
@@ -64,6 +57,35 @@ Describe "Merge-MultiplePullRequest unit tests" -Tag "Unit" {
                 PullRequestId = "124"
                 Title = "This merges the pull requests"
             }
+        }
+    }
+
+    It "Will return a PullRequest object" {
+        Mock Get-PullRequestPolicyEvaluation -ModuleName gandt-azure-devops-tools -MockWith {
+            return New-Object -TypeName PullRequestPolicyEvaluation -Property @{
+                Status = "approved"
+            }
+        }
+
+        $TestParams = $SharedParams
+
+        $Output = Merge-MultiplePullRequest @TestParams
+        $Output.GetType().Name | Should -Be "PullRequest"
+        Should -Invoke -CommandName Close-PullRequest -ModuleName gandt-azure-devops-tools -Exactly -Times 1
+        Should -Invoke -CommandName Remove-Branch -ModuleName gandt-azure-devops-tools -Exactly -Times 1
+        Should -Invoke -CommandName New-PullRequest -ModuleName gandt-azure-devops-tools -Exactly -Times 1
+    }
+
+    It "Will return a PullRequest object if multiple policies exist" {
+        Mock Get-PullRequestPolicyEvaluation -ModuleName gandt-azure-devops-tools -MockWith {
+            return @(
+                $(New-Object -TypeName PullRequestPolicyEvaluation -Property @{
+                    Status = "approved"
+                }),
+                $(New-Object -TypeName PullRequestPolicyEvaluation -Property @{
+                    Status = "approved"
+                })
+            )
         }
 
         $TestParams = $SharedParams

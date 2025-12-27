@@ -89,6 +89,8 @@ function Merge-MultiplePullRequest {
     $BranchesToMerge = @()
 
     foreach ($PullRequest in $PullRequests) {
+        Write-Information "Checking evaluations for pull request $($PullRequest.PullRequestId)"
+
         # check for included labels
         $SkipBranch = $true
         foreach ($Label in $LabelsToInclude) {
@@ -97,6 +99,7 @@ function Merge-MultiplePullRequest {
             }
         }
         if ($SkipBranch) {
+            Write-Information "Skipping pull request $($PullRequest.PullRequestId)"
             continue
         }
 
@@ -104,24 +107,29 @@ function Merge-MultiplePullRequest {
         ##TO DO: implement this later
 
         # check if PR built successfully
-        $PolicyEvaluation = Get-PullRequestPolicyEvaluation @BaseParams -PullRequestId $PullRequest.PullRequestId
+        $PolicyEvaluations = Get-PullRequestPolicyEvaluation @BaseParams -PullRequestId $PullRequest.PullRequestId
         $Retries = 0
-        while ($PolicyEvaluation.Status -notcontains "approved" -and $PullRequest.Description -notmatch "/skip-build-check") {
+        while ($PolicyEvaluations.Status -match "queued|running" -and $PullRequest.Description -notmatch "/skip-build-check") {
             if ($Retries -gt $PolicyEvaluationRetries) {
                 break
             }
             Start-Sleep -Seconds $PolicyEvaluationWaitSeconds
-            $PolicyEvaluation = Get-PullRequestPolicyEvaluation @BaseParams -PullRequestId $PullRequest.PullRequestId
-            Write-Information "Policy evaluation status for pull request $($PullRequest.PullRequestId) is $($PolicyEvaluation.Status)"
+            $PolicyEvaluations = Get-PullRequestPolicyEvaluation @BaseParams -PullRequestId $PullRequest.PullRequestId
+            Write-Verbose "Policy evaluation statuses for pull request $($PullRequest.PullRequestId) are:`n $($PolicyEvaluations | Out-String)"
             $Retries++
         }
-        if ($PolicyEvaluation.Status -eq "approved" -or $PullRequest.Description -match "/skip-build-check") {
+        $UnapprovedPolicyCount = ($PolicyEvaluations.Status | Where-Object { $_ -ne "approved" }).Count
+        Write-Information "UnapprovedPolicyCount for pull request $($PullRequest.PullRequestId) is $UnapprovedPolicyCount"
+        if ($UnapprovedPolicyCount -eq 0 -or $PullRequest.Description -match "/skip-build-check") {
             $BranchesToMerge += @{
                 PullRequestId = $PullRequest.PullRequestId
                 SourceBranchRef = $PullRequest.SourceBranchRef
                 SourceCommitId = $PullRequest.LastMergeSourceCommit
                 Title = $PullRequest.Title
             }
+        }
+        else {
+            Write-Information "Policy evaluation statuses for pull request $($PullRequest.PullRequestId) are:`n $($PolicyEvaluations | Out-String)"
         }
     }
 
