@@ -1,13 +1,16 @@
-Push-Location -Path $PSScriptRoot\..\
+BeforeAll {
+    Push-Location -Path $PSScriptRoot\..\
+    . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
+}
 
 Describe "New-Deployment unit tests" -Tag "Unit" {
 
-    . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
-
-    $SharedParams = @{
-        Instance = "notarealinstance"
-        PatToken = "not-a-real-token"
-        ProjectName = "notarealproject"
+    BeforeEach {
+        $SharedParams = @{
+            Instance = "notarealinstance"
+            PatToken = "not-a-real-token"
+            ProjectName = "notarealproject"
+        }
     }
 
     It "Will call Invoke-AzDevOpsRestMethod with the PATCH HttpMethod and return a ReleaseEnvironment object" {
@@ -219,8 +222,8 @@ Describe "New-Deployment unit tests" -Tag "Unit" {
         $TestParams["ReleaseId"] = "999"
 
         $Output = New-Deployment @TestParams
-        Assert-MockCalled -CommandName Invoke-AzDevOpsRestMethod -Times 1 -ParameterFilter { $HttpMethod -eq "PATCH" -and $HttpBody.comment -eq "Requested via API call using PAT token."  -and $HttpBody.status -eq "inProgress" }
-        $Output.GetType().Name | Should Be "ReleaseEnvironment"
+        Should -Invoke -CommandName Invoke-AzDevOpsRestMethod -Times 1 -ParameterFilter { $HttpMethod -eq "PATCH" -and $HttpBody.comment -eq "Requested via API call using PAT token."  -and $HttpBody.status -eq "inProgress" }
+        $Output.GetType().Name | Should -Be "ReleaseEnvironment"
     }
 
 }

@@ -1,14 +1,17 @@
-Push-Location -Path $PSScriptRoot\..\
+BeforeAll {
+    Push-Location -Path $PSScriptRoot\..\
+    . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
+}
 
 Describe "Get-CodeCoverage unit tests" -Tag "Unit" {
 
-    . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
-
-    $SharedParams = @{
-        Instance = "notarealinstance"
-        PatToken = "not-a-real-token"
-        ProjectId = "notarealproject"
-        BuildId = "1234"
+    BeforeEach {
+        $SharedParams = @{
+            Instance = "notarealinstance"
+            PatToken = "not-a-real-token"
+            ProjectId = "notarealproject"
+            BuildId = "1234"
+        }
     }
 
     It "Will return a CodeCoverage object when passed a BuildId" {
@@ -38,7 +41,7 @@ Describe "Get-CodeCoverage unit tests" -Tag "Unit" {
         $TestParams = $SharedParams
 
         $Output = Get-CodeCoverage @TestParams
-        $Output.GetType().Name | Should Be "CodeCoverage"
+        $Output.GetType().Name | Should -Be "CodeCoverage"
     }
 
 }

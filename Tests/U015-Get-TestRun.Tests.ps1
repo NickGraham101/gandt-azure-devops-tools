@@ -1,14 +1,17 @@
-Push-Location -Path $PSScriptRoot\..\
+BeforeAll {
+    Push-Location -Path $PSScriptRoot\..\
+    . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
+}
 
 Describe "Get-TestRun unit tests" -Tag "Unit" {
 
-    . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
-
-    $SharedParams = @{
-        Instance = "notarealinstance"
-        PatToken = "not-a-real-token"
-        ProjectId = "notarealproject"
-        BuildId = "1234"
+    BeforeEach {
+        $SharedParams = @{
+            Instance = "notarealinstance"
+            PatToken = "not-a-real-token"
+            ProjectId = "notarealproject"
+            BuildId = "1234"
+        }
     }
 
     It "Will return a TestRun object when passed a BuildId" {
@@ -46,8 +49,8 @@ Describe "Get-TestRun unit tests" -Tag "Unit" {
         $TestParams = $SharedParams
 
         $Output = Get-TestRun @TestParams
-        $Output.GetType().Name | Should Be "Object[]"
-        $Output[0].GetType().Name | Should Be "TestRun"
+        $Output.GetType().Name | Should -Be "Object[]"
+        $Output[0].GetType().Name | Should -Be "TestRun"
     }
 
 }

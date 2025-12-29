@@ -1,19 +1,22 @@
-Push-Location -Path $PSScriptRoot\..\
-
-Describe "New-CherryPick unit tests" -Tag "Unit" {
-
+BeforeAll {
+    Push-Location -Path $PSScriptRoot\..\
     . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
     . .\gandt-azure-devops-tools\Classes\Repository.ps1
     . .\gandt-azure-devops-tools\Functions\Public\Git\Get-Repository.ps1
+}
 
-    $SharedParams = @{
-        Instance = "notarealinstance"
-        PatToken = "not-a-real-token"
-        ProjectId = "notarealproject"
-        RepositoryId = "1234"
-        SourceBranchRef = "/heads/refs/foo-branch"
-        SourceCommit = "abcd1234efgh"
-        TargetBranchName = "1234"
+Describe "New-CherryPick unit tests" -Tag "Unit" {
+
+    BeforeEach {
+        $SharedParams = @{
+            Instance = "notarealinstance"
+            PatToken = "not-a-real-token"
+            ProjectId = "notarealproject"
+            RepositoryId = "1234"
+            SourceBranchRef = "/heads/refs/foo-branch"
+            SourceCommit = "abcd1234efgh"
+            TargetBranchName = "1234"
+        }
     }
 
     It "Will return a CherryPick object" {
@@ -39,7 +42,7 @@ Describe "New-CherryPick unit tests" -Tag "Unit" {
         $TestParams = $SharedParams
 
         $Output = New-CherryPick @TestParams
-        $Output.GetType().Name | Should Be "CherryPick"
-        $Output.CherryPickId | Should Be "0987"
+        $Output.GetType().Name | Should -Be "CherryPick"
+        $Output.CherryPickId | Should -Be "0987"
     }
 }

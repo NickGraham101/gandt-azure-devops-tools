@@ -1,4 +1,6 @@
-Push-Location -Path $PSScriptRoot\..\
+BeforeAll {
+    Push-Location -Path $PSScriptRoot\..\
+}
 
 Describe "Import-Module AzDevOps" -Tag "Acceptance" {
 

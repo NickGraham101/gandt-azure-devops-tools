@@ -1,13 +1,16 @@
-Push-Location -Path $PSScriptRoot\..\
+BeforeAll {
+    Push-Location -Path $PSScriptRoot\..\
+    . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
+}
 
 Describe "Get-Build unit tests" -Tag "Unit" {
 
-    . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
-
-    $SharedParams = @{
-        Instance = "notarealinstance"
-        PatToken = "not-a-real-token"
-        ProjectId = "notarealprojectid"
+    BeforeEach {
+        $SharedParams = @{
+            Instance = "notarealinstance"
+            PatToken = "not-a-real-token"
+            ProjectId = "notarealprojectid"
+        }
     }
 
     It "Will return a Build object if passed a valid BuildId" {
@@ -168,8 +171,8 @@ Describe "Get-Build unit tests" -Tag "Unit" {
 
         $Output = Get-Build @TestParams
 
-        $Output.GetType().Name | Should Be "Build"
-        $Output.BuildId | Should Be 111
+        $Output.GetType().Name | Should -Be "Build"
+        $Output.BuildId | Should -Be 111
 
     }
 }

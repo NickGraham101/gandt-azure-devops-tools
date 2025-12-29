@@ -1,15 +1,18 @@
-Push-Location -Path $PSScriptRoot\..\
+BeforeAll {
+    Push-Location -Path $PSScriptRoot\..\
+    . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
+}
 
 Describe "Get-PullRequestPolicyEvaluation unit tests" -Tag "Unit" {
 
-    . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
-
-    $SharedParams = @{
-        Instance = "notarealinstance"
-        PatToken = "not-a-real-token"
-        ProjectId = "notarealproject"
-        RepositoryId = "1234"
-        PullRequestId = "5678"
+    BeforeEach {
+        $SharedParams = @{
+            Instance = "notarealinstance"
+            PatToken = "not-a-real-token"
+            ProjectId = "notarealproject"
+            RepositoryId = "1234"
+            PullRequestId = "5678"
+        }
     }
 
     It "Will return an array of Get-PullRequestPolicyEvaluation objects" {
@@ -44,8 +47,8 @@ Describe "Get-PullRequestPolicyEvaluation unit tests" -Tag "Unit" {
         $TestParams = $SharedParams
 
         $Output = Get-PullRequestPolicyEvaluation @TestParams
-        $Output.GetType().Name | Should Be "Object[]"
-        $Output[0].GetType().Name | Should Be "PullRequestPolicyEvaluation"
-        $Output[0].BuildDefinitionName | Should Be "foo-build"
+        $Output.GetType().Name | Should -Be "Object[]"
+        $Output[0].GetType().Name | Should -Be "PullRequestPolicyEvaluation"
+        $Output[0].BuildDefinitionName | Should -Be "foo-build"
     }
 }

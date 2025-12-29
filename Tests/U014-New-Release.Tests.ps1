@@ -1,13 +1,16 @@
-Push-Location -Path $PSScriptRoot\..\
+BeforeAll {
+    Push-Location -Path $PSScriptRoot\..\
+    . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
+}
 
 Describe "New-Release unit tests" -Tag "Unit" {
 
-    . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
-
-    $SharedParams = @{
-        Instance = "notarealinstance"
-        PatToken = "not-a-real-token"
-        ProjectName = "notarealproject"
+    BeforeEach {
+        $SharedParams = @{
+            Instance = "notarealinstance"
+            PatToken = "not-a-real-token"
+            ProjectName = "notarealproject"
+        }
     }
 
     It "Will call Invoke-AzDevOpsRestMethod with the POST Http Method and return a Release object" {
@@ -219,8 +222,8 @@ Describe "New-Release unit tests" -Tag "Unit" {
         $TestParams["ReleaseDefinitionId"] = "7"
 
         $Output = New-Release @TestParams
-        Assert-MockCalled -CommandName Invoke-AzDevOpsRestMethod -Times 1 -ParameterFilter { $HttpMethod -eq "POST" -and $HttpBody.definitionId -eq 7 -and $HttpBody.isDraft -eq $false}
-        $Output.GetType().Name | Should Be "Release"
+        Should -Invoke -CommandName Invoke-AzDevOpsRestMethod -Times 1 -ParameterFilter { $HttpMethod -eq "POST" -and $HttpBody.definitionId -eq 7 -and $HttpBody.isDraft -eq $false}
+        $Output.GetType().Name | Should -Be "Release"
     }
 
 }

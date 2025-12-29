@@ -1,18 +1,21 @@
-Push-Location -Path $PSScriptRoot\..\
+BeforeAll {
+    Push-Location -Path $PSScriptRoot\..\
+    . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
+}
 
 Describe "New-PullRequest unit tests" -Tag "Unit" {
 
-    . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
-
-    $SharedParams = @{
-        Instance = "notarealinstance"
-        PatToken = "not-a-real-token"
-        ProjectId = "notarealproject"
-        RepositoryId = "1234"
-        PullRequestTitle = "Merge foo into bar"
-        PullRequestDescription = "This merges foo into bar"
-        SourceBranchRef = "refs/head/foo"
-        TargetBranchRef = "refs/head/bar"
+    BeforeEach {
+        $SharedParams = @{
+            Instance = "notarealinstance"
+            PatToken = "not-a-real-token"
+            ProjectId = "notarealproject"
+            RepositoryId = "1234"
+            PullRequestTitle = "Merge foo into bar"
+            PullRequestDescription = "This merges foo into bar"
+            SourceBranchRef = "refs/head/foo"
+            TargetBranchRef = "refs/head/bar"
+        }
     }
 
     It "Will return a PullRequest object" {
@@ -35,7 +38,7 @@ Describe "New-PullRequest unit tests" -Tag "Unit" {
         $TestParams = $SharedParams
 
         $Output = New-PullRequest @TestParams
-        $Output.GetType().Name | Should Be "PullRequest"
-        $Output.SourceBranchRef | Should Be "refs/head/foo"
+        $Output.GetType().Name | Should -Be "PullRequest"
+        $Output.SourceBranchRef | Should -Be "refs/head/foo"
     }
 }

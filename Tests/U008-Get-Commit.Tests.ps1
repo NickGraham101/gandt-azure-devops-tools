@@ -1,13 +1,16 @@
-Push-Location -Path $PSScriptRoot\..\
+BeforeAll {
+    Push-Location -Path $PSScriptRoot\..\
+    . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
+}
 
 Describe "Get-Commit unit tests" -Tag "Unit" {
 
-    . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
-
-    $SharedParams = @{
-        Instance = "notarealinstance"
-        PatToken = "not-a-real-token"
-        ProjectId = "notarealprojectid"
+    BeforeEach {
+        $SharedParams = @{
+            Instance = "notarealinstance"
+            PatToken = "not-a-real-token"
+            ProjectId = "notarealprojectid"
+        }
     }
 
     It "Will return a Commit object when passed a CommitId" {
@@ -73,7 +76,7 @@ Describe "Get-Commit unit tests" -Tag "Unit" {
         $TestParams["CommitId"] = "4390cc36323ff17db0c37b3e54841c8ef5ca635a"
 
         $Output = Get-Commit @TestParams
-        $Output.GetType().Name | Should Be "Commit"
+        $Output.GetType().Name | Should -Be "Commit"
     }
 
 }

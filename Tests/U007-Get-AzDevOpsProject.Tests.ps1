@@ -1,13 +1,16 @@
-Push-Location -Path $PSScriptRoot\..\
+BeforeAll {
+    Push-Location -Path $PSScriptRoot\..\
+    . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
+}
 
 Describe "Get-AzDevOpsProject unit tests" -Tag "Unit" {
 
-    . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
-
-    $SharedParams = @{
-        Instance = "notarealinstance"
-        PatToken = "not-a-real-token"
-        ProjectName = "notarealproject"
+    BeforeEach {
+        $SharedParams = @{
+            Instance = "notarealinstance"
+            PatToken = "not-a-real-token"
+            ProjectName = "notarealproject"
+        }
     }
 
     It "Will return a AzDevOpsProject object when passed a ProjectName" {
@@ -55,8 +58,8 @@ Describe "Get-AzDevOpsProject unit tests" -Tag "Unit" {
         $TestParams = $SharedParams
 
         $Output = Get-AzDevOpsProject @TestParams
-        $Output.GetType().Name | Should Be "AzDevOpsProject"
-        $Output.Id | Should Be "c391561c-ca89-434a-b4f5-e017f4db897a"
+        $Output.GetType().Name | Should -Be "AzDevOpsProject"
+        $Output.Id | Should -Be "c391561c-ca89-434a-b4f5-e017f4db897a"
     }
 
 }

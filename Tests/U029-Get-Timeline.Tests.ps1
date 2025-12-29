@@ -1,14 +1,17 @@
-Push-Location -Path $PSScriptRoot\..\
+BeforeAll {
+    Push-Location -Path $PSScriptRoot\..\
+    . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
+}
 
 Describe "Get-Timeline unit tests" -Tag "Unit" {
 
-    . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
-
-    $SharedParams = @{
-        Instance = "notarealinstance"
-        PatToken = "not-a-real-token"
-        ProjectId = "notarealproject"
-        BuildId = "1234"
+    BeforeEach {
+        $SharedParams = @{
+            Instance = "notarealinstance"
+            PatToken = "not-a-real-token"
+            ProjectId = "notarealproject"
+            BuildId = "1234"
+        }
     }
 
     It "Will return a Timeline object with all types failed" {
@@ -43,11 +46,11 @@ Describe "Get-Timeline unit tests" -Tag "Unit" {
         $TestParams = $SharedParams
 
         $Output = Get-Timeline @TestParams
-        $Output.GetType().Name | Should Be "Timeline"
-        $Output.BuildId | Should Be "1234"
-        $Output.FailedJobs | Should Be $true
-        $Output.FailedStages | Should Be $true
-        $Output.FailedTasks | Should Be $true
+        $Output.GetType().Name | Should -Be "Timeline"
+        $Output.BuildId | Should -Be "1234"
+        $Output.FailedJobs | Should -Be $true
+        $Output.FailedStages | Should -Be $true
+        $Output.FailedTasks | Should -Be $true
     }
 
     It "Will return a Timeline object with all types not failed" {
@@ -82,10 +85,10 @@ Describe "Get-Timeline unit tests" -Tag "Unit" {
         $TestParams = $SharedParams
 
         $Output = Get-Timeline @TestParams
-        $Output.GetType().Name | Should Be "Timeline"
-        $Output.BuildId | Should Be "1234"
-        $Output.FailedJobs | Should Be $false
-        $Output.FailedStages | Should Be $false
-        $Output.FailedTasks | Should Be $false
+        $Output.GetType().Name | Should -Be "Timeline"
+        $Output.BuildId | Should -Be "1234"
+        $Output.FailedJobs | Should -Be $false
+        $Output.FailedStages | Should -Be $false
+        $Output.FailedTasks | Should -Be $false
     }
 }

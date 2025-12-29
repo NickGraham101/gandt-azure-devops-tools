@@ -1,18 +1,21 @@
-Push-Location -Path $PSScriptRoot\..\
+BeforeAll {
+    Push-Location -Path $PSScriptRoot\..\
+    . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
+}
 
 Describe "New-Merge unit tests" -Tag "Unit" {
 
-    . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
-
-    $SharedParams = @{
-        Instance = "notarealinstance"
-        PatToken = "not-a-real-token"
-        ProjectId = "notarealproject"
-        RepositoryId = "1234"
-        Comment = "Merge to foo to bar"
-        BranchCommit = "5678"
-        DestinationBranchName = "refs/head/bar"
-        DestinationCommit = "9012"
+    BeforeEach {
+        $SharedParams = @{
+            Instance = "notarealinstance"
+            PatToken = "not-a-real-token"
+            ProjectId = "notarealproject"
+            RepositoryId = "1234"
+            Comment = "Merge to foo to bar"
+            BranchCommit = "5678"
+            DestinationBranchName = "refs/head/bar"
+            DestinationCommit = "9012"
+        }
     }
 
     It "Will return a Build object" {
@@ -53,7 +56,7 @@ Describe "New-Merge unit tests" -Tag "Unit" {
         $TestParams = $SharedParams
 
         $Output = New-Merge @TestParams
-        $Output.GetType().Name | Should Be "Branch"
-        $Output.Name | Should Be "refs/head/bar"
+        $Output.GetType().Name | Should -Be "Branch"
+        $Output.Name | Should -Be "refs/head/bar"
     }
 }

@@ -1,14 +1,17 @@
-Push-Location -Path $PSScriptRoot\..\
+BeforeAll {
+    Push-Location -Path $PSScriptRoot\..\
+    . .\gandt-azure-devops-tools\Classes\PipelineArtifact.ps1
+    . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
+}
 
 Describe "Get-ReleaseDefinition unit tests" -Tag "Unit" {
 
-    . .\gandt-azure-devops-tools\Classes\PipelineArtifact.ps1
-    . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
-
-    $SharedParams = @{
-        Instance = "notarealinstance"
-        PatToken = "not-a-real-token"
-        ProjectId = "notarealprojectid"
+    BeforeEach {
+        $SharedParams = @{
+            Instance = "notarealinstance"
+            PatToken = "not-a-real-token"
+            ProjectId = "notarealprojectid"
+        }
     }
 
     It "Will return a array containing 1 ReleaseDefinition object if passed a ReleaseDefinitionId" {
@@ -212,7 +215,7 @@ Describe "Get-ReleaseDefinition unit tests" -Tag "Unit" {
         $TestParams["DefinitionId"] = 10
 
         $Output = Get-ReleaseDefinition @TestParams
-        $Output[0].GetType().Name | Should Be "ReleaseDefinition"
+        $Output[0].GetType().Name | Should -Be "ReleaseDefinition"
     }
 
 }
