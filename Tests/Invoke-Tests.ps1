@@ -25,19 +25,17 @@ Param (
     [String]$CodeCoveragePath
 )
 
-$TestParameters = @{
-    OutputFormat = 'JUnitXml'
-    OutputFile   = "$PSScriptRoot\TEST-$TestType.xml"
-    Script       = "$PSScriptRoot"
-    PassThru     = $True
-}
+# Build Pester configuration
+$PesterConfig = New-PesterConfiguration
+$PesterConfig.Run.Path = "$PSScriptRoot"
+$PesterConfig.Run.PassThru = $true
+$PesterConfig.TestResult.Enabled = $true
+$PesterConfig.TestResult.OutputFormat = 'JUnitXml'
+$PesterConfig.TestResult.OutputPath = "$PSScriptRoot\TEST-$TestType.xml"
 
 if ($TestType -ne 'All') {
-
-    $TestParameters['Tag'] = $TestType
-
+    $PesterConfig.Filter.Tag = $TestType
 }
-
 
 if ($CodeCoveragePath) {
 
@@ -47,27 +45,29 @@ if ($CodeCoveragePath) {
         $RootPath = $CodeCoveragePath.Split("**")[0]
         $Files = Get-ChildItem -Path $RootPath -File -Recurse -Include *.ps1
         Write-Verbose "Found $($Files.Count) files for code coverage in $RootPath"
-        $TestParameters['CodeCoverage'] = $Files
+        $PesterConfig.CodeCoverage.Enabled = $true
+        $PesterConfig.CodeCoverage.Path = $Files
 
     }
     else {
 
         Write-Verbose "Using path $CodeCoveragePath for code coverage"
-        $TestParameters['CodeCoverage'] = $CodeCoveragePath
+        $PesterConfig.CodeCoverage.Enabled = $true
+        $PesterConfig.CodeCoverage.Path = $CodeCoveragePath
 
     }
-    $TestParameters['CodeCoverageOutputFile'] = "$PSScriptRoot\CODECOVERAGE-$TestType.xml"
+    $PesterConfig.CodeCoverage.OutputFormat = 'JaCoCo'
+    $PesterConfig.CodeCoverage.OutputPath = "$PSScriptRoot\CODECOVERAGE-$TestType.xml"
 
 }
 
-
 # Remove previous runs
-Remove-Item "$PSScriptRoot\TEST-*.xml"
-Remove-Item "$PSScriptRoot\CODECOVERAGE-*.xml"
+Remove-Item "$PSScriptRoot\TEST-*.xml" -ErrorAction SilentlyContinue
+Remove-Item "$PSScriptRoot\CODECOVERAGE-*.xml" -ErrorAction SilentlyContinue
 
 # Invoke tests
-Import-Module Pester -RequiredVersion 4.10.0
-$Result = Invoke-Pester @TestParameters
+Import-Module Pester -MinimumVersion 5.0.0
+$Result = Invoke-Pester -Configuration $PesterConfig
 
 # report failures
 if ($Result.FailedCount -ne 0) {

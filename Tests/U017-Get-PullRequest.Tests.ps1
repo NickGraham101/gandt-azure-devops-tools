@@ -1,14 +1,17 @@
-Push-Location -Path $PSScriptRoot\..\
+BeforeAll {
+    Push-Location -Path $PSScriptRoot\..\
+    . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
+}
 
 Describe "Get-PullRequest unit tests" -Tag "Unit" {
 
-    . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
-
-    $SharedParams = @{
-        Instance = "notarealinstance"
-        PatToken = "not-a-real-token"
-        ProjectId = "notarealproject"
-        RepositoryId = "1234"
+    BeforeEach {
+        $SharedParams = @{
+            Instance = "notarealinstance"
+            PatToken = "not-a-real-token"
+            ProjectId = "notarealproject"
+            RepositoryId = "1234"
+        }
     }
 
     It "Will return an array of PullRequest objects" {
@@ -37,9 +40,9 @@ Describe "Get-PullRequest unit tests" -Tag "Unit" {
         $TestParams = $SharedParams
 
         $Output = Get-PullRequest @TestParams
-        $Output.GetType().Name | Should Be "Object[]"
-        $Output[0].GetType().Name | Should Be "PullRequest"
-        $Output[0].Description | Should Be "Adds feature bar"
+        $Output.GetType().Name | Should -Be "Object[]"
+        $Output[0].GetType().Name | Should -Be "PullRequest"
+        $Output[0].Description | Should -Be "Adds feature bar"
     }
 
     It "Will return a PullRequest object when passed a PullRequestId" {
@@ -60,7 +63,7 @@ Describe "Get-PullRequest unit tests" -Tag "Unit" {
         $TestParams["PullRequestId"] = "5678"
 
         $Output = Get-PullRequest @TestParams
-        $Output.GetType().Name | Should Be "PullRequest"
-        $Output.Description | Should Be "Adds feature foo"
+        $Output.GetType().Name | Should -Be "PullRequest"
+        $Output.Description | Should -Be "Adds feature foo"
     }
 }

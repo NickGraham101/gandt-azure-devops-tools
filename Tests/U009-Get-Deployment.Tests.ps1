@@ -1,16 +1,19 @@
-Push-Location -Path $PSScriptRoot\..\
-
-Describe "Get-Deployment unit tests" -Tag "Unit" {
-
+BeforeAll {
+    Push-Location -Path $PSScriptRoot\..\
     . .\gandt-azure-devops-tools\Classes\PipelineArtifact.ps1
     . .\gandt-azure-devops-tools\Classes\ReleaseDefinition.ps1
     . .\gandt-azure-devops-tools\Functions\Public\Release\Get-ReleaseDefinition.ps1
     . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
+}
 
-    $SharedParams = @{
-        Instance = "notarealinstance"
-        PatToken = "not-a-real-token"
-        ProjectId = "notarealprojectid"
+Describe "Get-Deployment unit tests" -Tag "Unit" {
+
+    BeforeEach {
+        $SharedParams = @{
+            Instance = "notarealinstance"
+            PatToken = "not-a-real-token"
+            ProjectId = "notarealprojectid"
+        }
     }
 
     It "Will return a Deployment object if passed a ReleaseName and Environment" {
@@ -162,8 +165,8 @@ Describe "Get-Deployment unit tests" -Tag "Unit" {
         $TestParams["ReleaseName"] = "Release-123"
 
         $Output = Get-Deployment @TestParams
-        $Output.GetType().Name | Should Be "Deployment"
-        $Output.ReleaseId | Should Be "99"
+        $Output.GetType().Name | Should -Be "Deployment"
+        $Output.ReleaseId | Should -Be "99"
     }
 
 }

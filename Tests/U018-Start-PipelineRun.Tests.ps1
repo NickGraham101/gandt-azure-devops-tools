@@ -1,13 +1,16 @@
-Push-Location -Path $PSScriptRoot\..\
+BeforeAll {
+    Push-Location -Path $PSScriptRoot\..\
+    . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
+}
 
 Describe "New-PipelineRun unit tests" -Tag "Unit" {
 
-    . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
-
-    $SharedParams = @{
-        Instance = "notarealinstance"
-        PatToken = "not-a-real-token"
-        ProjectId = "notarealproject"
+    BeforeEach {
+        $SharedParams = @{
+            Instance = "notarealinstance"
+            PatToken = "not-a-real-token"
+            ProjectId = "notarealproject"
+        }
     }
 
     It "Will called Invoke-AzDevOpsRestMethod" {
@@ -20,6 +23,6 @@ Describe "New-PipelineRun unit tests" -Tag "Unit" {
         $TestParams["PipelineStage"] = "StageFoo"
 
         Start-PipelineRun @TestParams
-        Assert-MockCalled -CommandName Invoke-AzDevOpsRestMethod -Exactly -Times 1
+        Should -Invoke -CommandName Invoke-AzDevOpsRestMethod -Exactly -Times 1
     }
 }

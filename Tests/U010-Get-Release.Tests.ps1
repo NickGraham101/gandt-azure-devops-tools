@@ -1,14 +1,17 @@
-Push-Location -Path $PSScriptRoot\..\
+BeforeAll {
+    Push-Location -Path $PSScriptRoot\..\
+    . .\gandt-azure-devops-tools\Classes\ReleaseEnvironment.ps1
+    . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
+}
 
 Describe "Get-Release unit tests" -Tag "Unit" {
 
-    . .\gandt-azure-devops-tools\Classes\ReleaseEnvironment.ps1
-    . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
-
-    $SharedParams = @{
-        Instance = "notarealinstance"
-        PatToken = "not-a-real-token"
-        ProjectName = "notarealprojectname"
+    BeforeEach {
+        $SharedParams = @{
+            Instance = "notarealinstance"
+            PatToken = "not-a-real-token"
+            ProjectName = "notarealprojectname"
+        }
     }
 
     It "Will return a Release object when passed a Release name and Release Definition name" {
@@ -219,7 +222,7 @@ Describe "Get-Release unit tests" -Tag "Unit" {
         $TestParams["ReleaseDefinitionName"] = "notarealdefinition"
 
         $Output = Get-Release @TestParams
-        $Output.GetType().Name | Should Be "Release"
+        $Output.GetType().Name | Should -Be "Release"
     }
 
 }

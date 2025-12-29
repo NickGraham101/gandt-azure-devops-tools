@@ -1,4 +1,9 @@
-Push-Location -Path $PSScriptRoot\..\
+BeforeAll {
+    Push-Location -Path $PSScriptRoot\..\
+    . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
+    . .\gandt-azure-devops-tools\Classes\Commit.ps1
+    . .\gandt-azure-devops-tools\Functions\Public\Git\Get-Commit.ps1
+}
 
 Describe "Remove-Branch unit tests" -Tag "Unit" {
 
@@ -12,11 +17,8 @@ Describe "Remove-Branch unit tests" -Tag "Unit" {
         }
     }
 
-    . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
-    . .\gandt-azure-devops-tools\Classes\Commit.ps1
-    . .\gandt-azure-devops-tools\Functions\Public\Git\Get-Commit.ps1
-
-    $TestJson = @'
+    It "Will return a Branch object" {
+        $TestJson = @'
     {
         "value": [
             {
@@ -27,27 +29,26 @@ Describe "Remove-Branch unit tests" -Tag "Unit" {
     }
 '@
 
-    . .\gandt-azure-devops-tools\Classes\Branch.ps1
+        . .\gandt-azure-devops-tools\Classes\Branch.ps1
 
-    Mock Invoke-AzDevOpsRestMethod -MockWith {
-        return ConvertFrom-Json $TestJson
-    }
-
-    Mock Get-Commit -MockWith {
-        return New-Object -TypeName Commit -Property @{
-            CommitId = "0000000000000000000000000000000000000001"
+        Mock Invoke-AzDevOpsRestMethod -MockWith {
+            return ConvertFrom-Json $TestJson
         }
-    }
 
-    . .\gandt-azure-devops-tools\Classes\Branch.ps1
-    . .\gandt-azure-devops-tools\Functions\Public\Git\Get-Branch.ps1
-    . .\gandt-azure-devops-tools\Functions\Public\Git\Remove-Branch.ps1
+        Mock Get-Commit -MockWith {
+            return New-Object -TypeName Commit -Property @{
+                CommitId = "0000000000000000000000000000000000000001"
+            }
+        }
 
-    It "Will return a Branch object" {
+        . .\gandt-azure-devops-tools\Classes\Branch.ps1
+        . .\gandt-azure-devops-tools\Functions\Public\Git\Get-Branch.ps1
+        . .\gandt-azure-devops-tools\Functions\Public\Git\Remove-Branch.ps1
+
         $TestParams = $SharedParams
 
         $Output = Remove-Branch @TestParams
-        $Output.GetType().Name | Should Be "Branch"
-        $Output.CommitId | Should Be "0000000000000000000000000000000000000001"
+        $Output.GetType().Name | Should -Be "Branch"
+        $Output.CommitId | Should -Be "0000000000000000000000000000000000000001"
     }
 }

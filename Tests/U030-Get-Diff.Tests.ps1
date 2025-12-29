@@ -1,16 +1,19 @@
-Push-Location -Path $PSScriptRoot\..\
+BeforeAll {
+    Push-Location -Path $PSScriptRoot\..\
+    . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
+}
 
 Describe "Get-Diff unit tests" -Tag "Unit" {
 
-    . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
-
-    $SharedParams = @{
-        Instance = "notarealinstance"
-        PatToken = "not-a-real-token"
-        ProjectId = "notarealproject"
-        RepositoryId = "1234"
-        BaseBranch = "master"
-        TargetBranch = "feature"
+    BeforeEach {
+        $SharedParams = @{
+            Instance = "notarealinstance"
+            PatToken = "not-a-real-token"
+            ProjectId = "notarealproject"
+            RepositoryId = "1234"
+            BaseBranch = "master"
+            TargetBranch = "feature"
+        }
     }
 
     It "Will return a Diff object with file paths and folder paths" {
@@ -43,12 +46,12 @@ Describe "Get-Diff unit tests" -Tag "Unit" {
 
         $Output = Get-Diff @TestParams
 
-        $Output.GetType().Name | Should Be "Diff"
-        $Output.CommitId | Should Be "0000000000000000000000000000000000000001"
-        $Output.FilesChanged.Length | Should Be 1
-        $Output.PathsChanged.Length | Should Be 1
-        $Output.FilesChanged[0] | Should Be "/root/file.type"
-        $Output.PathsChanged[0] | Should Be "/root"
+        $Output.GetType().Name | Should -Be "Diff"
+        $Output.CommitId | Should -Be "0000000000000000000000000000000000000001"
+        $Output.FilesChanged.Length | Should -Be 1
+        $Output.PathsChanged.Length | Should -Be 1
+        $Output.FilesChanged[0] | Should -Be "/root/file.type"
+        $Output.PathsChanged[0] | Should -Be "/root"
     }
 
     It "Will return a Diff object with file paths but only folder paths of a specified length" {
@@ -119,11 +122,11 @@ Describe "Get-Diff unit tests" -Tag "Unit" {
 
         $Output = Get-Diff @TestParams
 
-        $Output.GetType().Name | Should Be "Diff"
-        $Output.CommitId | Should Be "0000000000000000000000000000000000000002"
-        $Output.FilesChanged.Length | Should Be 4
-        $Output.FileTypesChanged.Length | Should Be 3
-        $Output.PathsChanged.Length | Should Be 2
+        $Output.GetType().Name | Should -Be "Diff"
+        $Output.CommitId | Should -Be "0000000000000000000000000000000000000002"
+        $Output.FilesChanged.Length | Should -Be 4
+        $Output.FileTypesChanged.Length | Should -Be 3
+        $Output.PathsChanged.Length | Should -Be 2
     }
 
 }

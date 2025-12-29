@@ -1,7 +1,5 @@
-Push-Location -Path $PSScriptRoot\..\
-
-Describe "Get-ReleaseArtifacts unit tests" -Tag "Unit" {
-
+BeforeAll {
+    Push-Location -Path $PSScriptRoot\..\
     . .\gandt-azure-devops-tools\Classes\Build.ps1
     . .\gandt-azure-devops-tools\Classes\Commit.ps1
     . .\gandt-azure-devops-tools\Classes\ReleaseEnvironment.ps1
@@ -20,11 +18,16 @@ Describe "Get-ReleaseArtifacts unit tests" -Tag "Unit" {
         Name = "notarealprojectname"
     }
     Mock Get-AzDevOpsProject { return New-Object -TypeName AzDevOpsProject -Property $AzDevOpsProject }
+}
 
-    $SharedParams = @{
-        Instance = "notarealinstance"
-        PatToken = "not-a-real-token"
-        ProjectName = "notarealprojectname"
+Describe "Get-ReleaseArtifacts unit tests" -Tag "Unit" {
+
+    BeforeEach {
+        $SharedParams = @{
+            Instance = "notarealinstance"
+            PatToken = "not-a-real-token"
+            ProjectName = "notarealprojectname"
+        }
     }
 
     It "Will return an array of release artifacts if passed a ReleaseName" {
@@ -104,13 +107,13 @@ Describe "Get-ReleaseArtifacts unit tests" -Tag "Unit" {
         $TestParams["ReleaseName"] = "Release-NotReal"
 
         $Output = Get-ReleaseArtifacts @TestParams
-        Assert-MockCalled -CommandName Get-Release -Times 1 -Exactly
-        Assert-MockCalled -CommandName Get-Build -Times 1 -Exactly
-        Assert-MockCalled -CommandName Get-Commit -Times 1 -Exactly
-        $Output.Count | Should Be 2
-        $Output[0].GetType().Name | Should Be "ReleasedArtifact"
-        $Output[0].Filename | Should Be ".gitattributes"
-        $Output[0].Path | Should Be "/.gitattributes"
+        Should -Invoke -CommandName Get-Release -Exactly -Times 1
+        Should -Invoke -CommandName Get-Build -Exactly -Times 1
+        Should -Invoke -CommandName Get-Commit -Exactly -Times 1
+        $Output.Count | Should -Be 2
+        $Output[0].GetType().Name | Should -Be "ReleasedArtifact"
+        $Output[0].Filename | Should -Be ".gitattributes"
+        $Output[0].Path | Should -Be "/.gitattributes"
     }
 
 }

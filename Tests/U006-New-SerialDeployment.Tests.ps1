@@ -1,13 +1,16 @@
-Push-Location -Path $PSScriptRoot\..\
+BeforeAll {
+    Push-Location -Path $PSScriptRoot\..\
+    . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
+}
 
 Describe "New-SerialDeployment unit tests" -Tag "Unit" {
 
-    . .\gandt-azure-devops-tools\Functions\Private\Invoke-AzDevOpsRestMethod.ps1
-
-    $SharedParams = @{
-        Instance = "notarealinstance"
-        PatToken = "not-a-real-token"
-        ProjectName = "notarealprojectname"
+    BeforeEach {
+        $SharedParams = @{
+            Instance = "notarealinstance"
+            PatToken = "not-a-real-token"
+            ProjectName = "notarealprojectname"
+        }
     }
 
     It "Will throw an exception if ReleaseFolderPath parameter is '\'" {
@@ -24,7 +27,7 @@ Describe "New-SerialDeployment unit tests" -Tag "Unit" {
         $TestParams["ThisRelease"] = "Release-123"
         $TestParams["PrimaryArtefactBranchName"] = "master"
 
-        { New-SerialDeployment @TestParams } | Should Throw "Terminating serial deployment - triggering a serial deployment with a ReleaseFolderPath of '\' will release everything in your project!"
+        { New-SerialDeployment @TestParams } | Should -Throw "Terminating serial deployment - triggering a serial deployment with a ReleaseFolderPath of '\' will release everything in your project!"
 
     }
 
@@ -42,7 +45,7 @@ Describe "New-SerialDeployment unit tests" -Tag "Unit" {
         $TestParams["ThisRelease"] = "Release-123"
         $TestParams["PrimaryArtefactBranchName"] = "master"
 
-        { New-SerialDeployment @TestParams } | Should Throw "Terminating serial deployment - triggering a serial deployment with a ReleaseFolderPath of '\' will release everything in your project!"
+        { New-SerialDeployment @TestParams } | Should -Throw "Terminating serial deployment - triggering a serial deployment with a ReleaseFolderPath of '\' will release everything in your project!"
 
     }
 
