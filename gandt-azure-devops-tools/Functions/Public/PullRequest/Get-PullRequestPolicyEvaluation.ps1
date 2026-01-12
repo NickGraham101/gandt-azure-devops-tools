@@ -37,14 +37,20 @@ function Get-PullRequestPolicyEvaluation {
             AdditionalUriParameters = @{
                 artifactId = "vstfs:///CodeReview/CodeReviewId/$ProjectId/$PullRequestId"
             }
-            ApiVersion           = "7.1-preview.1"
+            ApiVersion           = "7.2-preview.1"
         }
 
         $PolicyEvaluationJson = Invoke-AzDevOpsRestMethod @GetPolicyEvaluationParams
         $PolicyEvaluations = @()
 
         foreach ($Item in $PolicyEvaluationJson.value) {
-            $PolicyEvaluations += New-PolicyEvaluationStatusObject -PolicyEvaluationStatusJson $Item
+            if ($Item.context) {
+                $PolicyEvaluations += New-PolicyEvaluationStatusObject -PolicyEvaluationStatusJson $Item
+            }
+            else {
+                Write-Warning "Evaluation $($Item.evaluationId) has no pipeline data, skipping ..."
+            }
+
         }
 
         $PolicyEvaluations
