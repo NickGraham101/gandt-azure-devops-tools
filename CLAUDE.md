@@ -2,6 +2,15 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Repository
+
+**Type:** Public (GitHub)
+**Remote:** `https://github.com/NickGraham101/gandt-azure-devops-tools`
+
+**Branch naming:** UpperCamelCase with no separators (e.g. `MyFeatureBranch`).
+
+**Worktrees:** Create in `../gandt-azure-devops-tools-worktrees/<branch-name>/` — never inside this directory.
+
 ## Running Tests
 
 ```powershell
