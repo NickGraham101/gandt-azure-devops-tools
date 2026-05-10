@@ -71,6 +71,8 @@ function New-PolicyEvaluationStatusObject {
         $PullRequestPolicyEvaluation.BuildDefinitionName = $PolicyEvaluationStatusJson.context.buildDefinitionName
         $PullRequestPolicyEvaluation.Status = $PolicyEvaluationStatusJson.status
         $PullRequestPolicyEvaluation.CompletedDate = $PolicyEvaluationStatusJson.completedDate ? $PolicyEvaluationStatusJson.completedDate : [DateTime]::MinValue
+        $PullRequestPolicyEvaluation.BuildId = $PolicyEvaluationStatusJson.context.buildId ? $PolicyEvaluationStatusJson.context.buildId : 0
+        $PullRequestPolicyEvaluation.IsExpired = [bool]$PolicyEvaluationStatusJson.context.isExpired
 
         $PullRequestPolicyEvaluation
 

@@ -3,4 +3,6 @@ class PullRequestPolicyEvaluation {
     [string]$BuildDefinitionName
     [string]$Status
     [DateTime]$CompletedDate
+    [int]$BuildId
+    [bool]$IsExpired
 }
