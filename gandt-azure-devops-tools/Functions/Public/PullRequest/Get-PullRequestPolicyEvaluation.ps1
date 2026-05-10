@@ -67,6 +67,7 @@ function New-PolicyEvaluationStatusObject {
 
         $PullRequestPolicyEvaluation = New-Object -TypeName PullRequestPolicyEvaluation
 
+        $PullRequestPolicyEvaluation.EvaluationId = $PolicyEvaluationStatusJson.evaluationId
         $PullRequestPolicyEvaluation.BuildDefinitionId = $PolicyEvaluationStatusJson.context.buildDefinitionId
         $PullRequestPolicyEvaluation.BuildDefinitionName = $PolicyEvaluationStatusJson.context.buildDefinitionName
         $PullRequestPolicyEvaluation.Status = $PolicyEvaluationStatusJson.status

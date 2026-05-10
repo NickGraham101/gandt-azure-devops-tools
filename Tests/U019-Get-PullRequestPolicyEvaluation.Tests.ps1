@@ -20,6 +20,7 @@ Describe "Get-PullRequestPolicyEvaluation unit tests" -Tag "Unit" {
         {
             "value": [
                 {
+                    "evaluationId": "aabbccdd-0000-0000-0000-000000000001",
                     "completedDate":  "2017-08-01T21:04:05.787Z",
                     "status": "approved",
                     "context": {
@@ -51,6 +52,7 @@ Describe "Get-PullRequestPolicyEvaluation unit tests" -Tag "Unit" {
         $Output = Get-PullRequestPolicyEvaluation @TestParams
         $Output.GetType().Name | Should -Be "Object[]"
         $Output[0].GetType().Name | Should -Be "PullRequestPolicyEvaluation"
+        $Output[0].EvaluationId | Should -Be "aabbccdd-0000-0000-0000-000000000001"
         $Output[0].BuildDefinitionName | Should -Be "foo-build"
         $Output[0].BuildId | Should -Be 11192
         $Output[0].IsExpired | Should -Be $true
