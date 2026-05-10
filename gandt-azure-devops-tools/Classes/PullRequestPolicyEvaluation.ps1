@@ -1,4 +1,5 @@
 class PullRequestPolicyEvaluation {
+    [string]$EvaluationId
     [int]$BuildDefinitionId
     [string]$BuildDefinitionName
     [string]$Status
