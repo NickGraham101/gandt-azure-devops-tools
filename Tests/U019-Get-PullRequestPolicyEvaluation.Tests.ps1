@@ -24,7 +24,9 @@ Describe "Get-PullRequestPolicyEvaluation unit tests" -Tag "Unit" {
                     "status": "approved",
                     "context": {
                         "buildDefinitionId": "9876",
-                        "buildDefinitionName": "foo-build"
+                        "buildDefinitionName": "foo-build",
+                        "buildId": 11192,
+                        "isExpired": true
                     }
                 },
                 {
@@ -50,5 +52,9 @@ Describe "Get-PullRequestPolicyEvaluation unit tests" -Tag "Unit" {
         $Output.GetType().Name | Should -Be "Object[]"
         $Output[0].GetType().Name | Should -Be "PullRequestPolicyEvaluation"
         $Output[0].BuildDefinitionName | Should -Be "foo-build"
+        $Output[0].BuildId | Should -Be 11192
+        $Output[0].IsExpired | Should -Be $true
+        $Output[1].BuildId | Should -Be 0
+        $Output[1].IsExpired | Should -Be $false
     }
 }
