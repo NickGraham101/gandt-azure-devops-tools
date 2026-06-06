@@ -1,7 +1,7 @@
 function New-PullRequest {
     <#
         .NOTES
-        API Reference: https://learn.microsoft.com/en-us/rest/api/azure/devops/git/refs/update-refs?view=azure-devops-rest-7.0&tabs=HTTP
+        API Reference: https://learn.microsoft.com/en-us/rest/api/azure/devops/git/pull-requests/create?view=azure-devops-rest-7.0&tabs=HTTP
 
         Permissions: PAT token or identity that System.AccessToken is derived from will require the
         following permissions on the repository:
@@ -39,7 +39,9 @@ function New-PullRequest {
 
         #Full name of the target branch, ie 'refs/heads/master' rather than 'master'
         [Parameter(Mandatory = $true)]
-        [string]$TargetBranchRef
+        [string]$TargetBranchRef,
+
+        [switch]$IsDraft
     )
 
     $Body = @{
@@ -47,6 +49,7 @@ function New-PullRequest {
         targetRefName = $TargetBranchRef
         title = $PullRequestTitle
         description = $PullRequestDescription
+        isDraft = $IsDraft.IsPresent
     }
 
     $NewPullRequestParams = @{
