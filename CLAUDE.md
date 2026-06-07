@@ -9,6 +9,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Branch naming:** UpperCamelCase with no separators (e.g. `MyFeatureBranch`).
 
+**Commit messages:** Plain imperative, no conventional-commits prefix.
+- New cmdlet: `Add <CmdletName>` or `Add <CmdletName>; <extra detail>`
+- Modified cmdlet: `<CmdletName>: <what changed>`
+- Other: imperative verb + description (`Remove ...`, `Upgrade ...`)
+
 **Worktrees:** Create in `../gandt-azure-devops-tools-worktrees/<branch-name>/` — never inside this directory.
 
 ## Running Tests
