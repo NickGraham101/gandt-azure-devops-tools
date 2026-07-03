@@ -56,8 +56,17 @@ Describe "Merge-MultiplePullRequest unit tests" -Tag "Unit" {
             return New-Object -TypeName PullRequest -Property @{
                 PullRequestId = "124"
                 Title = "This merges the pull requests"
+                CreatedById = "aabbccdd-0000-0000-0000-000000000002"
             }
         }
+        Mock Update-PullRequest -ModuleName gandt-azure-devops-tools -MockWith {
+            return New-Object -TypeName PullRequest -Property @{
+                PullRequestId = "124"
+                Title = "This merges the pull requests"
+                CreatedById = "aabbccdd-0000-0000-0000-000000000002"
+            }
+        }
+        Mock Invoke-PullRequestPolicyEvaluation -ModuleName gandt-azure-devops-tools
     }
 
     It "Will return a PullRequest object" {
@@ -95,5 +104,44 @@ Describe "Merge-MultiplePullRequest unit tests" -Tag "Unit" {
         Should -Invoke -CommandName Close-PullRequest -ModuleName gandt-azure-devops-tools -Exactly -Times 1
         Should -Invoke -CommandName Remove-Branch -ModuleName gandt-azure-devops-tools -Exactly -Times 1
         Should -Invoke -CommandName New-PullRequest -ModuleName gandt-azure-devops-tools -Exactly -Times 1
+    }
+
+    It "Will requeue expired policy evaluations and skip the pull request" {
+        Mock Get-PullRequestPolicyEvaluation -ModuleName gandt-azure-devops-tools -MockWith {
+            return New-Object -TypeName PullRequestPolicyEvaluation -Property @{
+                EvaluationId = "aabbccdd-0000-0000-0000-000000000001"
+                Status = "rejected"
+                IsExpired = $true
+            }
+        }
+
+        $TestParams = $SharedParams
+
+        $Output = Merge-MultiplePullRequest @TestParams -WarningAction SilentlyContinue
+        $Output | Should -BeNullOrEmpty
+        Should -Invoke -CommandName Invoke-PullRequestPolicyEvaluation -ModuleName gandt-azure-devops-tools -Exactly -Times 1 -ParameterFilter {
+            $EvaluationId -eq "aabbccdd-0000-0000-0000-000000000001"
+        }
+        Should -Invoke -CommandName New-PullRequest -ModuleName gandt-azure-devops-tools -Exactly -Times 0
+    }
+
+    It "Will set auto complete on the staging pull request when SetAutoComplete is passed" {
+        Mock Get-PullRequestPolicyEvaluation -ModuleName gandt-azure-devops-tools -MockWith {
+            return New-Object -TypeName PullRequestPolicyEvaluation -Property @{
+                Status = "approved"
+            }
+        }
+
+        $TestParams = $SharedParams + @{
+            SetAutoComplete = $true
+        }
+
+        $Output = Merge-MultiplePullRequest @TestParams
+        $Output.GetType().Name | Should -Be "PullRequest"
+        Should -Invoke -CommandName Update-PullRequest -ModuleName gandt-azure-devops-tools -Exactly -Times 1 -ParameterFilter {
+            $AutoCompleteSetById -eq "aabbccdd-0000-0000-0000-000000000002" -and
+            $MergeStrategy -eq "squash" -and
+            $DeleteSourceBranch -eq $true
+        }
     }
 }
