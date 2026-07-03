@@ -56,6 +56,15 @@ function Merge-MultiplePullRequest {
         [Parameter(Mandatory = $false)]
         [int]$PolicyEvaluationWaitSeconds= 30,
 
+        #Sets the staging pull request to complete automatically once its policies pass
+        [Parameter(Mandatory = $false)]
+        [switch]$SetAutoComplete,
+
+        #Merge strategy used when auto-completing the staging pull request
+        [Parameter(Mandatory = $false)]
+        [ValidateSet("noFastForward", "squash", "rebase", "rebaseMerge")]
+        [string]$AutoCompleteMergeStrategy = "squash",
+
         #Parameter Description
         [Parameter(Mandatory = $true, ParameterSetName = "GitHiresMerge")]
         [string]$GitEmail,
@@ -117,6 +126,21 @@ function Merge-MultiplePullRequest {
             $PolicyEvaluations = Get-PullRequestPolicyEvaluation @BaseParams -PullRequestId $PullRequest.PullRequestId
             Write-Verbose "Policy evaluation statuses for pull request $($PullRequest.PullRequestId) are:`n $($PolicyEvaluations | Out-String)"
             $Retries++
+        }
+        $ExpiredEvaluations = @($PolicyEvaluations | Where-Object { $_.IsExpired })
+        if ($ExpiredEvaluations.Count -gt 0 -and $PullRequest.Description -notmatch "/skip-build-check") {
+            foreach ($ExpiredEvaluation in $ExpiredEvaluations) {
+                Write-Information "Requeueing expired policy evaluation $($ExpiredEvaluation.EvaluationId) for pull request $($PullRequest.PullRequestId)"
+                $RequeueParams = @{
+                    Instance = $Instance
+                    PatToken = $PatToken
+                    ProjectId = $ProjectId
+                    EvaluationId = $ExpiredEvaluation.EvaluationId
+                }
+                Invoke-PullRequestPolicyEvaluation @RequeueParams | Out-Null
+            }
+            Write-Information "Skipping pull request $($PullRequest.PullRequestId) until requeued policy evaluations complete"
+            continue
         }
         $UnapprovedPolicyCount = ($PolicyEvaluations.Status | Where-Object { $_ -ne "approved" }).Count
         Write-Information "UnapprovedPolicyCount for pull request $($PullRequest.PullRequestId) is $UnapprovedPolicyCount"
@@ -210,6 +234,17 @@ function Merge-MultiplePullRequest {
         }
         else {
             ##TO DO: update PR description
+        }
+
+        if ($SetAutoComplete) {
+            Write-Information "Setting auto-complete on pull request $($StagingPullRequest.PullRequestId)"
+            $AutoCompleteParams = $BaseParams + @{
+                PullRequestId = $StagingPullRequest.PullRequestId
+                AutoCompleteSetById = $StagingPullRequest.CreatedById
+                MergeStrategy = $AutoCompleteMergeStrategy
+                DeleteSourceBranch = $true
+            }
+            $StagingPullRequest = Update-PullRequest @AutoCompleteParams
         }
 
         $StagingPullRequest
