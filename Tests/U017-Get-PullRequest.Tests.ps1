@@ -50,7 +50,10 @@ Describe "Get-PullRequest unit tests" -Tag "Unit" {
         {
             "pullRequestId":  "5678",
             "description": "Adds feature foo",
-            "title": "Add Foo Feature"
+            "title": "Add Foo Feature",
+            "createdBy": {
+                "id": "aabbccdd-0000-0000-0000-000000000002"
+            }
         }
 '@
 
@@ -65,5 +68,6 @@ Describe "Get-PullRequest unit tests" -Tag "Unit" {
         $Output = Get-PullRequest @TestParams
         $Output.GetType().Name | Should -Be "PullRequest"
         $Output.Description | Should -Be "Adds feature foo"
+        $Output.CreatedById | Should -Be "aabbccdd-0000-0000-0000-000000000002"
     }
 }

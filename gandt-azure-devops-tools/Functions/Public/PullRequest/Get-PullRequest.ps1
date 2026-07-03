@@ -87,6 +87,7 @@ function New-PullRequestObject {
         $PullRequest.SourceBranchRef = $PullRequestJson.sourceRefName
         $PullRequest.LastMergeSourceCommit = $PullRequestJson.lastMergeSourceCommit.commitId
         $PullRequest.Labels = $Labels.value.name
+        $PullRequest.CreatedById = $PullRequestJson.createdBy.id
 
         $PullRequest
 
