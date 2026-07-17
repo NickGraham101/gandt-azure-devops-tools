@@ -3,4 +3,5 @@ class Timeline {
     [bool]$FailedJobs
     [bool]$FailedStages
     [bool]$FailedTasks
+    [TimelineRecord[]]$Records
 }

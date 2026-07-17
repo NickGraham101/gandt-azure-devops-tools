@@ -32,7 +32,19 @@ Describe "Get-Timeline unit tests" -Tag "Unit" {
                 },
                 {
                     "Result": "failed",
-                    "Type": "Task"
+                    "Type": "Task",
+                    "name": "Run tests",
+                    "state": "completed",
+                    "log": {
+                        "id": 5
+                    },
+                    "errorCount": 1,
+                    "issues": [
+                        {
+                            "type": "error",
+                            "message": "Test run failed."
+                        }
+                    ]
                 }
             ]
         }
@@ -40,6 +52,7 @@ Describe "Get-Timeline unit tests" -Tag "Unit" {
 
         Mock Invoke-AzDevOpsRestMethod { return ConvertFrom-Json $TestJson }
 
+        . .\gandt-azure-devops-tools\Classes\TimelineRecord.ps1
         . .\gandt-azure-devops-tools\Classes\Timeline.ps1
         . .\gandt-azure-devops-tools\Functions\Public\Build\Get-Timeline.ps1
 
@@ -51,6 +64,12 @@ Describe "Get-Timeline unit tests" -Tag "Unit" {
         $Output.FailedJobs | Should -Be $true
         $Output.FailedStages | Should -Be $true
         $Output.FailedTasks | Should -Be $true
+        $Output.Records.Count | Should -Be 4
+        $FailedTask = $Output.Records | Where-Object {$_.Type -eq "Task" -and $_.Result -eq "failed"}
+        $FailedTask.Name | Should -Be "Run tests"
+        $FailedTask.LogId | Should -Be 5
+        $FailedTask.ErrorCount | Should -Be 1
+        $FailedTask.Issues | Should -Be "Test run failed."
     }
 
     It "Will return a Timeline object with all types not failed" {
@@ -79,6 +98,7 @@ Describe "Get-Timeline unit tests" -Tag "Unit" {
 
         Mock Invoke-AzDevOpsRestMethod { return ConvertFrom-Json $TestJson }
 
+        . .\gandt-azure-devops-tools\Classes\TimelineRecord.ps1
         . .\gandt-azure-devops-tools\Classes\Timeline.ps1
         . .\gandt-azure-devops-tools\Functions\Public\Build\Get-Timeline.ps1
 
