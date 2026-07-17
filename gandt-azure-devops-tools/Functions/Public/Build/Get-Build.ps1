@@ -24,11 +24,31 @@ function Get-Build {
 
         #The branch name, for git repos must be in the full reference, eg refs/heads/master rather than master
         [Parameter(Mandatory=$true, ParameterSetName="BranchName")]
+        [Parameter(Mandatory=$false, ParameterSetName="List")]
         [string]$BranchName,
 
         #Parameter Description
         [Parameter(Mandatory=$true, ParameterSetName="BranchName")]
-        [int]$BuildDefinitionId
+        [Parameter(Mandatory=$false, ParameterSetName="List")]
+        [int]$BuildDefinitionId,
+
+        #Returns a list of recent builds, optionally filtered by BuildDefinitionId, BranchName, StatusFilter and ResultFilter
+        [Parameter(Mandatory=$true, ParameterSetName="List")]
+        [switch]$List,
+
+        #Filters list results to builds with the specified status
+        [Parameter(Mandatory=$false, ParameterSetName="List")]
+        [ValidateSet("all", "cancelling", "completed", "inProgress", "none", "notStarted", "postponed")]
+        [string]$StatusFilter,
+
+        #Filters list results to builds with the specified result
+        [Parameter(Mandatory=$false, ParameterSetName="List")]
+        [ValidateSet("canceled", "failed", "none", "partiallySucceeded", "succeeded")]
+        [string]$ResultFilter,
+
+        #The maximum number of builds to return when listing
+        [Parameter(Mandatory=$false, ParameterSetName="List")]
+        [int]$Top
 
     )
 
@@ -53,6 +73,41 @@ function Get-Build {
             $GetBuildParams["AdditionalUriParameters"] = @{
                 definitions = $BuildDefinitionId
                 branchName = $BranchName
+            }
+
+        }
+        elseif ($PSCmdlet.ParameterSetName -eq "List") {
+
+            $AdditionalUriParameters = @{}
+            if ($PSBoundParameters.ContainsKey("BuildDefinitionId")) {
+
+                $AdditionalUriParameters["definitions"] = $BuildDefinitionId
+
+            }
+            if ($PSBoundParameters.ContainsKey("BranchName")) {
+
+                $AdditionalUriParameters["branchName"] = $BranchName
+
+            }
+            if ($StatusFilter) {
+
+                $AdditionalUriParameters["statusFilter"] = $StatusFilter
+
+            }
+            if ($ResultFilter) {
+
+                $AdditionalUriParameters["resultFilter"] = $ResultFilter
+
+            }
+            if ($Top) {
+
+                $AdditionalUriParameters['$top'] = $Top
+
+            }
+            if ($AdditionalUriParameters.Count -gt 0) {
+
+                $GetBuildParams["AdditionalUriParameters"] = $AdditionalUriParameters
+
             }
 
         }
@@ -123,7 +178,12 @@ function New-BuildObject {
         $Build.BuildDefinitionName = $BuildJson.definition.name
         $Build.DefintionId = $BuildJson.definition.id
         $Build.QueueTime = $BuildJson.queueTime
+        $Build.StartTime = $BuildJson.startTime
+        $Build.FinishTime = $BuildJson.finishTime
+        $Build.Status = $BuildJson.status
+        $Build.Result = $BuildJson.result
         $Build.Reason = $BuildJson.reason
+        $Build.SourceVersion = $BuildJson.sourceVersion
         if ($BuildJson.repository.type -eq "GitHub") {
 
             $Build.RepositoryId = $BuildJson.repository.id

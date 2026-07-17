@@ -53,5 +53,23 @@ function New-TimelineObject {
     $Timeline.FailedJobs = $null -ne ($TimelineJson.records | Where-Object {$_.Type -eq "Job" -and $_.Result -eq "failed"})
     $Timeline.FailedStages = $null -ne ($TimelineJson.records | Where-Object {$_.Type -eq "Stage" -and $_.Result -eq "failed"})
     $Timeline.FailedTasks = $null -ne ($TimelineJson.records | Where-Object {$_.Type -eq "Task" -and $_.Result -eq "failed"})
+    $Timeline.Records = foreach ($Record in $TimelineJson.records) {
+
+        $TimelineRecord = New-Object -TypeName TimelineRecord
+        $TimelineRecord.RecordId = $Record.id
+        $TimelineRecord.ParentId = $Record.parentId
+        $TimelineRecord.Type = $Record.type
+        $TimelineRecord.Name = $Record.name
+        $TimelineRecord.State = $Record.state
+        $TimelineRecord.Result = $Record.result
+        $TimelineRecord.StartTime = $Record.startTime
+        $TimelineRecord.FinishTime = $Record.finishTime
+        $TimelineRecord.Order = $Record.order
+        $TimelineRecord.LogId = $Record.log.id
+        $TimelineRecord.ErrorCount = $Record.errorCount
+        $TimelineRecord.Issues = $Record.issues | ForEach-Object { $_.message }
+        $TimelineRecord
+
+    }
     $Timeline
 }

@@ -175,4 +175,79 @@ Describe "Get-Build unit tests" -Tag "Unit" {
         $Output.BuildId | Should -Be 111
 
     }
+
+    It "Will return a collection of Build objects when listing builds" {
+        $TestJson = @'
+        {
+            "count": 2,
+            "value": [
+                {
+                    "id": 111,
+                    "buildNumber": "20260701.1",
+                    "status": "completed",
+                    "result": "failed",
+                    "queueTime": "2026-07-01T10:00:00Z",
+                    "startTime": "2026-07-01T10:01:00Z",
+                    "finishTime": "2026-07-01T10:10:00Z",
+                    "sourceBranch": "refs/heads/master",
+                    "sourceVersion": "111111aaaaaaabbbbbbbb",
+                    "reason": "individualCI",
+                    "definition": {
+                        "id": 10,
+                        "name": "notarealproject"
+                    },
+                    "repository": {
+                        "id": "100df32a-6b04-4d02-a219-91ae71159fb9",
+                        "type": "TfsGit",
+                        "name": "notarealproject"
+                    }
+                },
+                {
+                    "id": 112,
+                    "buildNumber": "20260702.1",
+                    "status": "completed",
+                    "result": "succeeded",
+                    "queueTime": "2026-07-02T10:00:00Z",
+                    "startTime": "2026-07-02T10:01:00Z",
+                    "finishTime": "2026-07-02T10:10:00Z",
+                    "sourceBranch": "refs/heads/master",
+                    "sourceVersion": "222222aaaaaaabbbbbbbb",
+                    "reason": "individualCI",
+                    "definition": {
+                        "id": 10,
+                        "name": "notarealproject"
+                    },
+                    "repository": {
+                        "id": "100df32a-6b04-4d02-a219-91ae71159fb9",
+                        "type": "TfsGit",
+                        "name": "notarealproject"
+                    }
+                }
+            ]
+        }
+'@
+        Mock Invoke-AzDevOpsRestMethod { return ConvertFrom-Json $TestJson }
+
+        . .\gandt-azure-devops-tools\Classes\Build.ps1
+        . .\gandt-azure-devops-tools\Functions\Public\Build\Get-Build.ps1
+
+        $TestParams = $SharedParams
+        $TestParams["List"] = $true
+        $TestParams["BuildDefinitionId"] = 10
+        $TestParams["ResultFilter"] = "failed"
+        $TestParams["Top"] = 2
+
+        $Output = Get-Build @TestParams
+
+        $Output.Count | Should -Be 2
+        $Output[0].GetType().Name | Should -Be "Build"
+        $Output[0].BuildId | Should -Be 112
+        $Output[0].Result | Should -Be "succeeded"
+        $Output[1].Status | Should -Be "completed"
+        Should -Invoke Invoke-AzDevOpsRestMethod -ParameterFilter {
+            $AdditionalUriParameters["definitions"] -eq 10 -and
+            $AdditionalUriParameters["resultFilter"] -eq "failed" -and
+            $AdditionalUriParameters['$top'] -eq 2
+        }
+    }
 }
