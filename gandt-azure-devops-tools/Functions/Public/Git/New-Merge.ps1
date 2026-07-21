@@ -137,6 +137,11 @@ function New-Merge {
                             $ConflictedFilePath = ($ConflictedFilePathMatch | Select-Object -ExpandProperty Groups | Select-Object -ExpandProperty Captures)[1].Value
                             # export doesn't work inside Invoke-Expression
                             Write-Information($(sh -c "export GIT_HIRES_MERGE_NON_INTERACTIVE_MODE=True;export PYTHONWARNINGS=ignore;./git-hires-merge $ConflictedFilePath") | ConvertTo-Json) -InformationAction Continue
+                            if (Test-ConflictMarker -Content (Get-Content $ConflictedFilePath)) {
+                                Write-Information "git-hires-merge left unresolved conflict markers in $ConflictedFilePath, aborting merge."
+                                Invoke-Expression "git reset --hard" | Out-Null
+                                return
+                            }
                             Write-Information $(Invoke-Expression "git add $ConflictedFilePath" | ConvertTo-Json)
                         }
                         Write-Information $(Invoke-Expression "git commit -m `"Merge branch $BranchName into $DestinationBranchName`"" | ConvertTo-Json)
