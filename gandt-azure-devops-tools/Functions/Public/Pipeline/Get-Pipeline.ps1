@@ -49,15 +49,21 @@ function Get-Pipeline {
 
     if ($PSCmdlet.ParameterSetName -eq "Name") {
 
-        $Match = $PipelineJson.value | Where-Object { $_.name -eq $Name }
+        $Matches = @($PipelineJson.value | Where-Object { $_.name -eq $Name })
 
-        if (-not $Match) {
+        if ($Matches.Count -eq 0) {
 
             throw "No pipeline found with name '$Name'"
 
         }
 
-        return New-PipelineObject -PipelineJson $Match
+        if ($Matches.Count -gt 1) {
+
+            throw "Multiple pipelines found with name '$Name' (ids: $($Matches.id -join ', ')) - use -PipelineId instead"
+
+        }
+
+        return New-PipelineObject -PipelineJson $Matches[0]
 
     }
     elseif ($PSCmdlet.ParameterSetName -eq "List") {

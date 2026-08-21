@@ -82,6 +82,27 @@ Describe "Get-Pipeline unit tests" -Tag "Unit" {
         { Get-Pipeline @TestParams } | Should -Throw "*does-not-exist*"
     }
 
+    It "Will throw when multiple pipelines match the given Name" {
+        $TestJson = @'
+        {
+            "count": 2,
+            "value": [
+                { "id": 42, "name": "notarealpipelinefoo", "folder": "\\", "revision": 3 },
+                { "id": 44, "name": "notarealpipelinefoo", "folder": "\\Archive", "revision": 1 }
+            ]
+        }
+'@
+        Mock Invoke-AzDevOpsRestMethod { return ConvertFrom-Json $TestJson }
+
+        . .\gandt-azure-devops-tools\Classes\Pipeline.ps1
+        . .\gandt-azure-devops-tools\Functions\Public\Pipeline\Get-Pipeline.ps1
+
+        $TestParams = $SharedParams
+        $TestParams["Name"] = "notarealpipelinefoo"
+
+        { Get-Pipeline @TestParams } | Should -Throw "*Multiple pipelines found*"
+    }
+
     It "Will return a collection of Pipeline objects when listing" {
         $TestJson = @'
         {
