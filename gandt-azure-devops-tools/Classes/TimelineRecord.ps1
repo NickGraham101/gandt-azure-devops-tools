@@ -5,6 +5,7 @@ class TimelineRecord {
     [string]$Name
     [string]$State
     [string]$Result
+    [int]$Attempt
     $StartTime
     $FinishTime
     $Order
