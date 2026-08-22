@@ -62,6 +62,7 @@ function New-TimelineObject {
         $TimelineRecord.Name = $Record.name
         $TimelineRecord.State = $Record.state
         $TimelineRecord.Result = $Record.result
+        $TimelineRecord.Attempt = $Record.attempt
         $TimelineRecord.StartTime = $Record.startTime
         $TimelineRecord.FinishTime = $Record.finishTime
         $TimelineRecord.Order = $Record.order

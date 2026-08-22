@@ -39,6 +39,7 @@ Describe "Get-Timeline unit tests" -Tag "Unit" {
                         "id": 5
                     },
                     "errorCount": 1,
+                    "attempt": 2,
                     "issues": [
                         {
                             "type": "error",
@@ -69,6 +70,7 @@ Describe "Get-Timeline unit tests" -Tag "Unit" {
         $FailedTask.Name | Should -Be "Run tests"
         $FailedTask.LogId | Should -Be 5
         $FailedTask.ErrorCount | Should -Be 1
+        $FailedTask.Attempt | Should -Be 2
         $FailedTask.Issues | Should -Be "Test run failed."
     }
 
