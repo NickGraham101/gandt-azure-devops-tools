@@ -39,4 +39,9 @@ Describe "Test-ConflictMarker unit tests" -Tag "Unit" {
 
         Test-ConflictMarker -Content @() | Should -Be $false
     }
+
+    It "Will return false for null content, e.g. Get-Content on a file with no lines" {
+
+        Test-ConflictMarker -Content $null | Should -Be $false
+    }
 }

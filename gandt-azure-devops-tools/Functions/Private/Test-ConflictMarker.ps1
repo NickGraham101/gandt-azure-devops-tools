@@ -10,9 +10,12 @@ function Test-ConflictMarker {
     [CmdletBinding()]
     [OutputType([bool])]
     param(
-        #Lines of file content to check, e.g. from Get-Content
+        #Lines of file content to check, e.g. from Get-Content. Get-Content returns $null
+        #(rather than an empty array) for a file with no lines, which AllowEmptyCollection
+        #alone does not permit binding.
         [Parameter(Mandatory = $true)]
         [AllowEmptyCollection()]
+        [AllowNull()]
         [string[]]$Content
     )
 
