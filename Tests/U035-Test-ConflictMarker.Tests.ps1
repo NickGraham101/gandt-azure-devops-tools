@@ -44,4 +44,10 @@ Describe "Test-ConflictMarker unit tests" -Tag "Unit" {
 
         Test-ConflictMarker -Content $null | Should -Be $false
     }
+
+    It "Will return false for content containing a blank line, e.g. Get-Content on any real source file" {
+
+        $Content = @("using System;", "", "namespace Foo {", "}")
+        Test-ConflictMarker -Content $Content | Should -Be $false
+    }
 }
