@@ -25,7 +25,7 @@ function Invoke-AzDevOpsRestMethod {
     .NOTES
         Api documentation: https://docs.microsoft.com/en-us/rest/api/vsts/
     #>
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName="Components")]
     param (
         #The Visual Studio Team Services account name
         [Parameter(Mandatory=$true)]
@@ -44,7 +44,7 @@ function Invoke-AzDevOpsRestMethod {
         [string]$Area,
 
         #Required.  The resource being targetted.
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$true, ParameterSetName="Components")]
         [string]$Resource,
 
         #Optional. Required when API request is targetting a specific resource.
@@ -64,8 +64,17 @@ function Invoke-AzDevOpsRestMethod {
         [string]$ResourceSubComponent,
 
         #Required.  The version of the API that the request is targetting.
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory=$true, ParameterSetName="Components")]
         [string]$ApiVersion,
+
+        #Optional.  An absolute URI returned by a previous API call (eg an artifact downloadUrl), used as-is instead of building one from the components above.
+        #Must be https on an Azure DevOps host (*.visualstudio.com or *.azure.com), since the PAT is sent with it.
+        [Parameter(Mandatory=$true, ParameterSetName="Uri")]
+        [string]$Uri,
+
+        #Optional.  Saves the response body to this file path instead of returning it, eg for binary downloads.
+        [Parameter(Mandatory=$false)]
+        [string]$OutFile,
 
         #Optional.  Additional URI parameters can be passed as a hash table.  Parameters whose name contains a . should be wrapped in double quotes.
         [Parameter(Mandatory=$false)]
@@ -148,19 +157,41 @@ function Invoke-AzDevOpsRestMethod {
 
     }
 
-    $Uri = "https://$Instance$Vsrm.visualstudio.com/$Collection$TeamProject/_apis/$($Area)$($Resource)$($ResourceId)$($ResourceComponent)$($ResourceComponentId)$($ResourceSubComponent)?api-version=$($ApiVersion)$($UriParams)"
-    $Uri = [uri]::EscapeUriString($Uri)
-    if ($PSVersionTable.PSVersion -lt [System.Version]::new(6,0)) {
+    if ($PSCmdlet.ParameterSetName -eq "Components") {
 
-        if ($PSVersionTable.CLRVersion -le [System.Version]::new(4,0,30319,1700)) {
+        $Uri = "https://$Instance$Vsrm.visualstudio.com/$Collection$TeamProject/_apis/$($Area)$($Resource)$($ResourceId)$($ResourceComponent)$($ResourceComponentId)$($ResourceSubComponent)?api-version=$($ApiVersion)$($UriParams)"
+        $Uri = [uri]::EscapeUriString($Uri)
+        if ($PSVersionTable.PSVersion -lt [System.Version]::new(6,0)) {
 
-            $Uri = Format-EscapedUri -Uri $Uri
+            if ($PSVersionTable.CLRVersion -le [System.Version]::new(4,0,30319,1700)) {
+
+                $Uri = Format-EscapedUri -Uri $Uri
+
+            }
+
+        }
+
+    }
+    else {
+
+        # The PAT goes in the Authorization header, so only send it to Azure DevOps over https
+        $ParsedUri = $null
+        if (![uri]::TryCreate($Uri, [UriKind]::Absolute, [ref]$ParsedUri) -or $ParsedUri.Scheme -ne "https" -or
+            !($ParsedUri.Host -like "*.visualstudio.com" -or $ParsedUri.Host -like "*.azure.com")) {
+
+            throw "Refusing to send credentials to '$Uri': the Uri must be https on an Azure DevOps host (*.visualstudio.com or *.azure.com)"
 
         }
 
     }
     Write-Verbose -Message "Invoking URI: $Uri"
-    if(!$HttpBody -and !$HttpBodyString) {
+    if ($OutFile) {
+
+        Write-Verbose -Message "Saving response to $OutFile"
+        $Result = Invoke-RestMethod -Method $HttpMethod -Uri $Uri -Headers @{Authorization = 'Basic ' + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(":$($PatToken)"))} -OutFile $OutFile -UseBasicParsing
+
+    }
+    elseif(!$HttpBody -and !$HttpBodyString) {
 
         $Result = Invoke-RestMethod -Method $HttpMethod -Uri $Uri -Headers @{Authorization = 'Basic ' + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(":$($PatToken)"))} -UseBasicParsing
 
